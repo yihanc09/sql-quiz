@@ -1,0 +1,2 @@
+# Keep source datasets portable and reviewable across platforms.
+*.csv text eol=lf
