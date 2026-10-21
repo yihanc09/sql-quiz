@@ -9,6 +9,7 @@
 | [CHROMA_CLOUD.md](CHROMA_CLOUD.md) | Cloud credentials, indexing, deployment dependencies and real remote retrieval checks |
 | [AI_SQL_GENERATION.md](AI_SQL_GENERATION.md) | OpenAI configuration, generated SQL workflow, API boundaries and verification |
 | [WEEK8_PREPARATION.md](WEEK8_PREPARATION.md) | Completed RAG preparation and remaining implementation requirements |
+| [DEPLOYMENT_VERIFICATION.md](DEPLOYMENT_VERIFICATION.md) | Repository commits, successful CI/build evidence and remaining public checks |
 | [SCREENSHOTS.md](SCREENSHOTS.md) | Preserved screenshots from the original Week 7 project |
 
 Start with the [project README](../README.md). See [maintenance commands](../scripts/README.md) for database/data tooling.

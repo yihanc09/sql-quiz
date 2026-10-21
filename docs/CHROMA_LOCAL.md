@@ -90,6 +90,6 @@ Separately, all five quiz questions were embedded with the real MiniLM model and
 2. Use the verified [Chroma Cloud path](CHROMA_CLOUD.md) for remote storage and deployment-compatible embeddings.
 3. Verify the full flow on the deployed site and capture the required question/generated-SQL screenshot.
 
-The current public Vercel site has not received this local-only feature. `VERCEL` deployments default to the cloud path and explicitly refuse local vector storage; the existing quiz can continue to function without the optional native dependencies. Local OpenAI generation is implemented and smoke-tested; the assignment is not complete until the public site supports the same full flow.
+The public Vercel site uses the verified cloud path rather than this local storage backend; see [production verification](DEPLOYMENT_VERIFICATION.md). `VERCEL` deployments default to the cloud path and explicitly refuse local vector storage; the existing quiz can continue to function without the optional native dependencies. Both local generation and the public cloud-backed RAG flow are implemented and verified.
 
 References: [Chroma clients](https://docs.trychroma.com/docs/run-chroma/clients), [embedding functions and the default MiniLM model](https://docs.trychroma.com/docs/embeddings/embedding-functions), [vector query API](https://docs.trychroma.com/docs/querying-collections/query-and-get), [cosine index configuration](https://docs.trychroma.com/docs/collections/configure).

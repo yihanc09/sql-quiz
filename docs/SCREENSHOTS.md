@@ -1,6 +1,22 @@
-# Week 7 screenshots
+# Application screenshots
 
-These screenshots were originally added to the repository before the live-reference update. They document the Week 7 application and audit workflow; they are not evidence of Week 8 RAG generation.
+## Week 8: deployed RAG application
+
+Captured from the signed-in public application on October 21, 2026 after configuring the production Chroma/OpenAI secrets and redeploying.
+
+### Natural-language question and generated SQL
+
+![Production question and generated SQL](screenshots/week8-production-generated-sql.png)
+
+### Manual execution and cloud retrieval evidence
+
+The generated artist-count query returned 275. The retrieval inspector identifies Chroma Cloud, 17 documents and 1536-dimensional OpenAI embeddings. Execution was explicitly triggered; this is not evidence of automatic SQL validation extra credit.
+
+![Production SQL result and cloud retrieval metadata](screenshots/week8-production-cloud-result.png)
+
+## Original Week 7 screenshots
+
+The following preserved screenshots predate the live-reference/RAG update and document the original quiz and audit workflow.
 
 ## Week 7 application screenshot 1
 

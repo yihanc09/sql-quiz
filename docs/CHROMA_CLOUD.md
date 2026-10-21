@@ -4,7 +4,7 @@
 
 The 17 curated knowledge documents have been embedded with OpenAI `text-embedding-3-small` (1536 dimensions) and indexed in Chroma Cloud. Both vector retrieval and the cloud retrieval → OpenAI SQL-generation flow passed real requests on October 21, 2026 using the HTTP-only Chroma client in a clean environment, without ONNX or local model weights.
 
-See [real cloud retrieval](examples/chroma_cloud_retrieval.json) and [real cloud RAG generation](examples/chroma_cloud_generation.json). These are CLI verification records, not public-deployment screenshots. The local application can now use cloud retrieval; the public Vercel site still needs deployment environment configuration and the updated code.
+See [real cloud retrieval](examples/chroma_cloud_retrieval.json) and [real cloud RAG generation](examples/chroma_cloud_generation.json). These are CLI verification records, not public-deployment screenshots. The public Vercel application now uses this cloud path; see [authenticated production verification and screenshots](DEPLOYMENT_VERIFICATION.md).
 
 ## Backend configuration
 
@@ -65,7 +65,7 @@ Start/restart the server, sign in, and choose **Knowledge** on a question. **Sea
 3. Sign in on the public site, generate SQL, inspect cloud retrieval evidence, and optionally run the generated query with the existing reader.
 4. Capture the question/generated-SQL screenshot and update the submission README. Manual Run/Submit actions do not establish automatic execution/validation extra credit.
 
-At the time of this update, steps 1–4 have not been completed for the public site. Local cloud connectivity alone does not establish successful public deployment.
+Steps 1–4 were completed and checked on the public site on October 21, 2026; the verification record links actual CI/build results and browser screenshots.
 
 ## Offline verification
 

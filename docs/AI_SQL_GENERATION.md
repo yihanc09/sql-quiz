@@ -6,7 +6,7 @@ The local web application performs the full question → Chroma vector retrieval
 
 A real local call on October 21, 2026 retrieved five knowledge documents and generated `SELECT COUNT(*) AS total_artists FROM public.artist;`. The [captured response](examples/openai_generation.json) includes the generated SQL and actual retrieval evidence. It is a CLI smoke check, not a screenshot or a public deployment check.
 
-Cloud retrieval has subsequently been implemented and verified; see [Chroma Cloud](CHROMA_CLOUD.md). Public RAG deployment and submission screenshots remain outstanding. The public Vercel site still runs the previously published quiz.
+Cloud retrieval has subsequently been implemented and verified; see [Chroma Cloud](CHROMA_CLOUD.md). The full public flow and required screenshot are now verified; see [production verification](DEPLOYMENT_VERIFICATION.md).
 
 ## Configure and run
 
@@ -68,8 +68,8 @@ The response parser handles text after other output items, code fences, refusals
 
 Tests cover retrieval before generation, no model call on failed/empty retrieval, backend-only credentials, the Responses request, incomplete/refused responses, sanitized errors, login enforcement, and no SQL execution during generation. They mock the AI transport and do not consume account credits. The separate captured response above used real Chroma and OpenAI.
 
-## Remaining deployment work
+## Deployment maintenance
 
-The implemented Chroma Cloud path uses OpenAI embeddings consistently for ingestion and queries; follow the cloud setup guide. Configure `OPENAI_API_KEY` and `OPENAI_MODEL` as backend deployment environment variables, then verify the full public flow. Capture the actual question/generated-SQL screen for the README. Manual run/submit buttons are useful verification tools; this stage does not claim the assignment's automatic execution/validation extra credit.
+The implemented Chroma Cloud path uses OpenAI embeddings consistently for ingestion and queries; follow the cloud setup guide. Configure `OPENAI_API_KEY` and `OPENAI_MODEL` as backend deployment environment variables, then verify the full public flow whenever changing deployment configuration. The current public question/generated-SQL screenshot is included in the README. Manual run/submit buttons are useful verification tools; this stage does not claim the assignment's automatic execution/validation extra credit.
 
 Official references: [OpenAI text generation and Responses output](https://developers.openai.com/api/docs/guides/text), [GPT-4.1 mini model](https://developers.openai.com/api/docs/models/gpt-4.1-mini).

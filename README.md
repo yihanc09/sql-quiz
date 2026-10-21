@@ -8,7 +8,31 @@ A 20-point SQL quiz using Supabase PostgreSQL and Supabase Auth. Students sign i
 
 **Public application:** [sql-quiz-jade.vercel.app](https://sql-quiz-jade.vercel.app/)
 
-The main interface uses HTML/CSS/JavaScript and a Python HTTP backend. An optional Streamlit interface shares the same services. Week 8 now includes local ChromaDB retrieval over 17 embedded knowledge documents, and authenticated OpenAI SQL generation in the local web interface. The local flow retrieves relevant knowledge before calling the OpenAI Responses API. See [local Chroma setup](docs/CHROMA_LOCAL.md) and [AI generation setup and usage](docs/AI_SQL_GENERATION.md). Chroma Cloud indexing, remote retrieval, and cloud-backed generation have also passed real requests; see [cloud setup](docs/CHROMA_CLOUD.md). Public RAG deployment remains unfinished.
+The deployed web interface uses HTML/CSS/JavaScript and a Python HTTP backend. It now supports authenticated RAG SQL generation with Chroma Cloud and OpenAI. Supabase remains the live PostgreSQL database and authentication provider. The optional Streamlit interface supports the original SQL quiz.
+
+## RAG architecture and usage
+
+```text
+Natural-language question
+  → OpenAI text-embedding-3-small (1536 dimensions)
+  → Chroma Cloud cosine vector retrieval (top 5 sources)
+  → retrieved knowledge + question → OpenAI Responses API (gpt-4.1-mini)
+  → generated PostgreSQL displayed in the Knowledge tab
+```
+
+Chroma stores 17 curated documents: eleven table schemas, four business/SQL rules, and two independent few-shot examples. Generation performs actual vector retrieval; it does not load the five instructor answers or student submissions into the prompt.
+
+Sign in, open a question, and choose **Knowledge → Generate SQL**. Review the generated code and its sources. **Use in editor** replaces the current draft; **Run query** executes it through the existing restricted reader. **Submit answer** compares the result with the selected quiz question. Generation does not automatically run, save, or grade SQL; this project does not claim the automatic execution/validation extra credit.
+
+The public workflow was verified on October 21, 2026: the artist-count question generated `SELECT COUNT(*) AS total_artists FROM public.artist;`, and a manual run returned `275`. See [deployment verification and CI evidence](docs/DEPLOYMENT_VERIFICATION.md).
+
+## Required RAG screenshot
+
+Actual signed-in production question and generated SQL:
+
+![Natural-language question and AI-generated SQL on the deployed website](docs/screenshots/week8-production-generated-sql.png)
+
+[Additional production screenshot: executed SQL, 275 artists, and Chroma Cloud retrieval metadata](docs/screenshots/week8-production-cloud-result.png). This shows a manual execution check, not an automatic-validation feature.
 
 ## Run locally
 
@@ -22,7 +46,9 @@ python web_server.py --port 8001
 
 Open [localhost:8001](http://localhost:8001), sign in, select a question, and write SQL with the `public.` schema prefix. **Run query** shows the result. **Hint → Reference SQL & expected result → Load live reference** executes the instructor query. **Submit answer** compares the current result tables and saves the score.
 
-The existing project uses `DATABASE_URL` and `DATABASE_PASSWORD` in `.env`. Its remaining settings are stored in the backend-only `quiz_private.runtime_config` table. A fresh project also needs Auth, answer-table policies, and a restricted reader; see [setup and operations](docs/OPERATIONS.md).
+The existing project uses `DATABASE_URL` and `DATABASE_PASSWORD` in `.env`. Its Supabase application and reader settings are stored in the backend-only `quiz_private.runtime_config` table. A fresh project also needs Auth, answer-table policies, and a restricted reader; see [setup and operations](docs/OPERATIONS.md).
+
+For cloud-backed RAG, also fill the OpenAI/Chroma fields in `.env.example` using your own backend credentials and set `CHROMA_MODE=cloud`. Build your cloud collection once with `python -m scripts.index_knowledge --cloud`, then restart the server. See [cloud setup](docs/CHROMA_CLOUD.md) for all eight settings and [local Chroma setup](docs/CHROMA_LOCAL.md) if using local MiniLM instead. Never install the full and HTTP-only Chroma distributions together.
 
 Optional Streamlit interface:
 
@@ -97,6 +123,8 @@ Maintenance commands and their database effects are documented in [scripts/READM
 - [Local setup, deployment, configuration and audit operations](docs/OPERATIONS.md)
 - [Connecting the uploaded tables to live hints and grading](docs/LIVE_TABLE_LINKING.md)
 - [Local ChromaDB setup and real vector retrieval](docs/CHROMA_LOCAL.md)
-- [Week 8 RAG preparation and remaining requirements](docs/WEEK8_PREPARATION.md)
+- [Chroma Cloud setup](docs/CHROMA_CLOUD.md)
+- [OpenAI generation setup](docs/AI_SQL_GENERATION.md)
+- [Week 8 RAG preparation and implementation status](docs/WEEK8_PREPARATION.md)
 
-- [Original Week 7 application screenshots](docs/SCREENSHOTS.md)
+- [Production Week 8 and original Week 7 screenshots](docs/SCREENSHOTS.md)

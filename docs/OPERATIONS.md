@@ -165,4 +165,11 @@ This rebuilds `knowledge/documents.jsonl` from schema metadata and curated busin
 .venv/bin/python web_server.py --port 8001
 ```
 
-See [local Chroma setup](CHROMA_LOCAL.md) for installation and the retrieval inspector. Local retrieval and authenticated OpenAI generation are implemented; see [AI generation setup](AI_SQL_GENERATION.md). Chroma Cloud retrieval is now verified; see [cloud configuration](CHROMA_CLOUD.md). Public RAG deployment remains next. See [Week 8 preparation](WEEK8_PREPARATION.md) for remaining requirements.
+See [local Chroma setup](CHROMA_LOCAL.md) for installation and the retrieval inspector. Local retrieval and authenticated OpenAI generation are implemented; see [AI generation setup](AI_SQL_GENERATION.md). Chroma Cloud retrieval is now verified; see [cloud configuration](CHROMA_CLOUD.md). The public RAG flow is also verified; see [deployment evidence](DEPLOYMENT_VERIFICATION.md). See [Week 8 preparation](WEEK8_PREPARATION.md) for remaining requirements.
+
+
+## Import the RAG deployment environment
+
+In the existing Vercel project's **Environment Variables → Add new** form, choose **Import .env** and select the local ignored `.env.vercel` file. The import creates eight separate rows. **Key** is the variable name; **Value** is that variable's corresponding value, not the entire file. Use Secret for API credentials (storing all eight imported rows as Secret is also supported) and select Production. Save, then redeploy so the new function process receives these settings. Existing database/session variables should be retained.
+
+The import file is generated locally for this project and is not a repository artifact. The public placeholder list is in `.env.example`. See [deployment verification](DEPLOYMENT_VERIFICATION.md) for actual CI/build and application checks.
