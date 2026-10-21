@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#012169">
+  <meta name="description" content="IDS706 SQL practice with the Chinook Music Store database.">
+  <title>IDS706 · SQL Studio</title>
+  <link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#guide"><span class="brand-mark">D</span><span>IDS706<span class="brand-sub">DATA ENGINEERING</span></span></a>
+    <div class="workspace-label">YOUR WORKSPACE</div>
+    <nav id="navigation" aria-label="Quiz pages"></nav>
+    <div class="sidebar-bottom"><div class="session-tag"><span class="status-dot"></span> LOCAL WORKSPACE</div><p>Practice. Query. Understand.</p><span>Chinook Music Store · PostgreSQL</span></div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar"><div class="breadcrumb">IDS706 <span>/</span> SQL Studio <span>/</span> <strong id="page-name">Dataset guide</strong></div><button id="account-button" class="button small">Sign in <span aria-hidden="true">↗</span></button></header>
+    <main id="main" tabindex="-1"></main>
+    <footer><span>IDS706 · SQL Studio</span><span>Built for learning, one query at a time.</span></footer>
+  </div>
+  <dialog id="auth-dialog" aria-labelledby="auth-title">
+    <button class="close-button" id="close-auth" aria-label="Close sign-in dialog">×</button>
+    <div class="eyebrow">YOUR LEARNING WORKSPACE</div><h2 id="auth-title">Welcome back.</h2><p class="muted" id="auth-description">Sign in to save your work and track your progress.</p>
+    <div class="auth-tabs"><button id="login-tab" class="selected" type="button">Sign in</button><button id="signup-tab" type="button">Create account</button></div>
+    <form id="auth-form"><label for="email">Email address</label><input id="email" type="email" autocomplete="email" required placeholder="you@example.com"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required><p id="auth-message" role="status"></p><button id="auth-submit" class="button primary full" type="submit">Sign in →</button></form>
+    <p class="auth-foot">Your saved answers and grades follow your account.</p>
+  </dialog>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
