@@ -1,6 +1,6 @@
 const $ = (selector) => document.querySelector(selector);
 const escapeHTML = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state = {questions:[], total:20, user:null, records:{}, drafts:{}, results:{}, hints:{}, relationships:[], page:'guide', busy:false, mode:'login'};
+const state = {questions:[], total:20, user:null, records:{}, drafts:{}, results:{}, hints:{}, relationships:[], page:'guide', busy:false, storageWarning:null, mode:'login'};
 let tables = [];
 const scenarios = {
   1:['The catalog team wants to know how many artists are available.',['artist']],
@@ -29,13 +29,13 @@ async function api(path, data){
 }
 function gradeFor(qid){ const record=state.records[qid]; return record && record.score !== null && record.score !== undefined && record.sql_answer === (state.drafts[qid] || '') ? record : null; }
 function progress(){const grades=state.questions.map(q=>gradeFor(q.id)).filter(Boolean);return {count:grades.length,score:grades.reduce((sum,r)=>sum+Number(r.score),0)};}
-function hydrate(data){state.user=data.user;state.records=data.records || {};state.drafts={};state.results={};state.hints={};for(const [qid,record] of Object.entries(state.records))state.drafts[qid]=record.sql_answer || '';}
+function hydrate(data){state.user=data.user;state.storageWarning=data.warning || null;state.records=data.records || {};state.drafts={};state.results={};state.hints={};for(const [qid,record] of Object.entries(state.records))state.drafts[qid]=record.sql_answer || '';}
 function badge(grade){return grade ? `<span class="grade-tag ${grade.is_correct?'correct':'incorrect'}">${grade.is_correct?'Correct':'Not yet correct'}</span>`:'<span class="grade-tag">Not graded</span>';}
 function navigation(){
   $('#navigation').innerHTML=`<a href="#guide" class="nav-item ${state.page==='guide'?'active':''}" ${state.page==='guide'?'aria-current="page"':''}><span class="nav-icon">▤</span><span class="nav-text">Dataset guide</span></a><div class="nav-divider"></div>${state.questions.map(q=>`<a href="#question-${q.id}" class="nav-item ${state.page===q.id?'active':''}" ${state.page===q.id?'aria-current="page"':''}><span class="nav-icon nav-number">0${q.id}</span><span class="nav-text">${escapeHTML(q.title)}</span>${gradeFor(q.id)?.is_correct?'<span class="nav-check" aria-label="Correct">✓</span>':''}</a>`).join('')}<div class="nav-divider"></div><a href="#results" class="nav-item ${state.page==='results'?'active':''}" ${state.page==='results'?'aria-current="page"':''}><span class="nav-icon">◴</span><span class="nav-text">Quiz results</span></a>`;
 }
 function stats(){const p=progress();return `<div class="stats"><div class="stat"><div class="stat-icon">▤</div><div><strong>05</strong><span>SQL questions</span></div></div><div class="stat"><div class="stat-icon">◴</div><div><strong>${p.score} <small>/ ${state.total}</small></strong><span>Points earned</span></div></div><div class="stat"><div class="stat-icon">✓</div><div><strong>${p.count} <small>/ 5</small></strong><span>Questions graded</span></div></div></div>`;}
-function authCallout(){return state.user?'':`<div class="auth-callout">Explore the dataset guide, then <button data-action="signin">sign in</button> to run SQL, save answers, and submit for grading.</div>`;}
+function authCallout(){return state.user?(state.storageWarning?`<div class="auth-callout" role="status">${escapeHTML(state.storageWarning)}</div>`:''):`<div class="auth-callout">Explore the dataset guide, then <button data-action="signin">sign in</button> to run SQL, save answers, and submit for grading.</div>`;}
 function guide(){return `<div class="page-heading"><div><div class="eyebrow">LEARN BY DOING</div><h1>Your SQL workspace.</h1><p class="description">Explore a real-world dataset. Turn business questions into SQL.</p></div><span class="pill"><span class="status-dot"></span> PostgreSQL · Chinook</span></div>
   <section class="hero"><div class="hero-copy"><div class="eyebrow">IDS706 · SQL PRACTICE</div><h2>A little curiosity.<br>A powerful query.</h2><p>Step inside the Chinook Music Store. Explore artists, albums, and customer purchases across five practical SQL challenges.</p><a class="button" href="#question-1">Start the quiz <span>→</span></a></div><div class="hero-art" aria-hidden="true"><div class="code-card"><div class="window-dots"><i></i><i></i><i></i></div><pre><b>SELECT</b> curiosity,<br>       practice<br><b>FROM</b> your_potential<br><b>WHERE</b> growth = <em>TRUE</em>;</pre><div class="code-result"><span class="status-dot"></span> A new way to think in SQL.</div></div></div></section>
   ${stats()}${authCallout()}
@@ -97,7 +97,7 @@ $('#login-tab').addEventListener('click',()=>setMode('login'));$('#signup-tab').
 $('#auth-dialog').addEventListener('close',()=>{$('#password').value='';});
 $('#auth-form').addEventListener('submit',async e=>{
   e.preventDefault();$('#auth-submit').disabled=true;$('#auth-message').textContent='Connecting…';
-  try{const data=await api(state.mode==='login'?'login':'signup',{email:$('#email').value,password:$('#password').value});if(data.user){hydrate(data);$('#auth-dialog').close();render();toast('Signed in. Your saved work is ready.');}else{$('#auth-message').textContent=data.message;$('#password').value='';}}
+  try{const data=await api(state.mode==='login'?'login':'signup',{email:$('#email').value,password:$('#password').value});if(data.user){hydrate(data);$('#auth-dialog').close();render();toast(data.warning || 'Signed in. Your saved work is ready.', Boolean(data.warning));}else{$('#auth-message').textContent=data.message;$('#password').value='';}}
   catch(error){$('#auth-message').textContent=error.message;}finally{$('#auth-submit').disabled=false;}
 });
 window.addEventListener('hashchange',route);

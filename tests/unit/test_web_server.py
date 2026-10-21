@@ -167,3 +167,39 @@ def test_all_uploaded_tables_and_shared_hints_are_in_metadata(api_request):
     assert payload['database']['schema'] == 'public'
     assert len(payload['database']['tables']) == 11
     assert all(q['hint']['connections'] and q['tables'] for q in payload['questions'])
+
+
+def test_valid_login_survives_unavailable_submission_storage(api_request, monkeypatch):
+    user = SimpleNamespace(id='student', email='student@example.com')
+    session = SimpleNamespace(access_token='access', refresh_token='refresh')
+    client = web.SESSIONS['test']['client']
+    monkeypatch.setattr(web, 'sign_in', Mock(return_value=SimpleNamespace(user=user, session=session)))
+    monkeypatch.setattr(web, 'get_supabase_client', Mock(return_value=client))
+    web.load_answer_records.side_effect = RuntimeError('PGRST205 private database details')
+    status, payload, cookie = api_request('/api/login', {'email': user.email, 'password': 'test'}, False)
+    assert status == 200 and payload['user']['email'] == user.email
+    assert payload['records'] == {} and 'warning' in payload
+    assert 'private database' not in payload['warning']
+    assert 'quiz_session=' in cookie
+
+
+def test_session_verification_survives_unavailable_submission_storage(api_request):
+    web.load_answer_records.side_effect = RuntimeError('Storage unavailable')
+    status, payload = api_request('/api/session')
+    assert status == 200 and payload['user']['email'] == 'student@example.com'
+    assert payload['records'] == {} and 'warning' in payload
+
+
+def test_storage_outage_does_not_block_authenticated_query(api_request, monkeypatch):
+    web.load_answer_records.side_effect = RuntimeError('Storage unavailable')
+    monkeypatch.setattr(web, 'run_query', Mock(return_value=pd.DataFrame({'n': [1]})))
+    status, payload = api_request('/api/run', {'question_id': 1, 'sql': 'SELECT 1 AS n'})
+    assert status == 200 and payload['table']['data'] == [[1]]
+
+
+def test_invalid_credentials_do_not_create_session(api_request, monkeypatch):
+    monkeypatch.setattr(web, 'sign_in', Mock(side_effect=RuntimeError('invalid credentials')))
+    original = set(web.SESSIONS)
+    result = api_request('/api/login', {'email': 'student@example.com', 'password': 'wrong'}, False)
+    assert result[0] == 400 and len(result) == 2
+    assert set(web.SESSIONS) == original

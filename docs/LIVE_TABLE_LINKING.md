@@ -22,7 +22,7 @@ The active data source is now the user's 11 uploaded tables in `public`, not the
 
 The student and reference executions use separate read-only transactions. Concurrent business-data changes between those executions can affect a comparison; this assignment's static sample dataset avoids that practical issue. Displayed hints are labeled with their refresh time, and grading always fetches a fresh reference instead of using the displayed hint cache.
 
-Saved answers remain in `public.quiz_answers`, and audit events remain in `public.quiz_audit_log`. Those tables are separate from the business data and remain inaccessible to the query reader. Previously saved SQL is preserved as written; old drafts explicitly mentioning `chinook.` should be revised to `public.`. Old saved grades are historical until the user submits again.
+Student drafts and grades now live in `public.quiz_submissions`, and audit events remain in `public.quiz_audit_log`. The deleted legacy `quiz_answers` table and its historical records were not restored. Those tables are separate from the business data and remain inaccessible to the query reader. The new submission store starts empty. Instructor reference SQL remains in the application and queries business tables live; student storage is unrelated to the expected answer.
 
 ## Supabase changes applied
 
@@ -67,8 +67,8 @@ Sign in, open a question, and select **Show expected SQL & live result**. Type a
 
 Validation completed:
 
-- **78 offline tests passed**, including changing live reference values, authentication for hints, no static fallback, no grade save on reference failure, and shared 11-table metadata.
-- **36 hosted database/security tests passed**, including all five reference queries and all 11 table counts through the restricted reader. Current reference outputs have 1, 5, 25, 5, and 5 rows respectively.
+- **86 offline tests passed**, including changing live reference values, authentication for hints, no static fallback, no grade save on reference failure, and shared 11-table metadata.
+- **41 hosted database/security tests passed**, including all five reference queries and all 11 table counts through the restricted reader. Current reference outputs have 1, 5, 25, 5, and 5 rows respectively.
 - All 15,607 uploaded rows match the CSVs after normalization.
 - JavaScript syntax and a lightweight frontend behavior check passed for displaying 11 tables, rendering live hints, preserving the editor draft, and escaping displayed SQL. No browser was available for visual layout verification in this session.
 
@@ -77,3 +77,16 @@ The Actions workflow includes these checks. The canonical source and the connect
 ## RAG follow-up
 
 The prepared 17-document knowledge corpus now describes `public` tables. The five quiz answers and user submissions are not indexed. Vector retrieval and AI SQL generation remain the next implementation phase; this live-table connection does not itself constitute RAG.
+
+## Recovering after deleting legacy answer storage
+
+Deleting the old `quiz_answers` table left Auth accounts intact but broke the progress-loading step inside login. That failure was incorrectly returned as an authentication error.
+
+The application now separates verified authentication from progress loading. A valid login returns a session even if progress retrieval fails; a storage warning is shown separately. SQL execution remains available. Both the web and Streamlit interfaces use the dedicated `quiz_submissions` table for new drafts and grades.
+
+```bash
+python -m scripts.configure_submissions --apply
+python -m scripts.configure_submissions --check
+```
+
+The migration creates empty student storage, ownership RLS policies, required grants, timestamps, and the existing answer-change audit trigger. It does not restore deleted data, recreate the legacy table, seed solutions, or modify login accounts. Authenticated insert/update and cross-user isolation were verified in a forced-rollback transaction, with no test submissions retained.

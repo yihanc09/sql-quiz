@@ -46,7 +46,8 @@ def test_configured_entrypoint_is_an_http_handler():
     assert (root / "data/schema.json").is_file()
 
 
-def test_login_cookie_restores_on_another_instance_and_refreshes_tokens(vercel):
+@pytest.mark.parametrize("storage_failure", [False, True])
+def test_login_cookie_restores_on_another_instance_and_refreshes_tokens(vercel, storage_failure):
     user = SimpleNamespace(id="student", email="student@example.com")
     initial = SimpleNamespace(access_token="first-access", refresh_token="first-refresh")
     current = SimpleNamespace(access_token="refreshed-access", refresh_token="refreshed-refresh")
@@ -55,11 +56,12 @@ def test_login_cookie_restores_on_another_instance_and_refreshes_tokens(vercel):
     client.auth.get_session.return_value = initial
     vercel.setattr(web, "sign_in", Mock(return_value=SimpleNamespace(user=user, session=initial)))
     vercel.setattr(web, "get_supabase_client", Mock(return_value=client))
-    vercel.setattr(web, "load_answer_records", Mock(return_value={}))
+    vercel.setattr(web, "load_answer_records", Mock(return_value={}, side_effect=RuntimeError("storage unavailable") if storage_failure else None))
     login = request("/api/login", {"email": user.email, "password": "test-password"})
     login.do_POST()
     status, body, cookie = login.reply.call_args.args
-    assert status == 200 and body == {"user": {"email": user.email}, "records": {}}
+    assert status == 200 and body["user"] == {"email": user.email} and body["records"] == {}
+    assert ("warning" in body) == storage_failure
     assert "HttpOnly" in cookie and "Secure" in cookie and "SameSite=Strict" in cookie
     assert "first-access" not in cookie and "first-refresh" not in cookie
     assert not web.SESSIONS

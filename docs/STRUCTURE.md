@@ -45,4 +45,6 @@ The repository root contains launchers, project documentation and tool configura
 - **Database maintenance:** consult `scripts/README.md` to distinguish read-only checks from write operations.
 - **Validation:** `python -m pytest` runs offline tests; `python -m pytest tests/integration` runs the live suite.
 
+Student work is stored in `public.quiz_submissions`; instructor reference SQL stays in `sql_quiz/quiz.py`. Use `python -m scripts.configure_submissions --check` to inspect submission storage permissions.
+
 Local `.env` files and private configuration backups remain untracked. Python imports use `sql_quiz.*` and `scripts.*`. Asset paths resolve from the repository location rather than the caller's working directory.

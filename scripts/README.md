@@ -9,6 +9,8 @@ Run from the repository root using `python -m scripts.<command>`. Application se
 | `python -m scripts.prepare_data --apply` | Bootstrap missing tables and populate empty tables; reject nonempty mismatches | Writes database; rolls back on failure |
 | `python -m scripts.link_public_tables` | Preflight the uploaded public tables and existing reader | Database read-only |
 | `python -m scripts.link_public_tables --apply` | Normalize uploaded types, establish keys, SELECT grants and reader RLS policies | Writes database; retains existing records |
+| `python -m scripts.configure_submissions --apply` | Create empty student submission storage, per-user RLS and audit triggers | Writes database; does not restore deleted legacy answers |
+| `python -m scripts.configure_submissions --check` | Verify submission storage and role permissions | Database read-only |
 | `python -m scripts.configure_runtime --check` | Verify private runtime-settings permissions | Database read-only |
 | `python -m scripts.configure_runtime --init` | Apply private-settings migration and initialize existing local settings | Writes database |
 | `python -m scripts.audit_admin --check` | Verify audit permissions and append-only protections | Database probes, all forced to roll back |

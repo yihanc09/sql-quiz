@@ -73,6 +73,8 @@ All 11 uploaded tables are in the `public` schema. Five questions use seven of t
 
 Questions, hints, linked table names and reference SQL live in [sql_quiz/quiz.py](sql_quiz/quiz.py). [quiz_reference.py](sql_quiz/quiz_reference.py) executes the reference queries using the restricted reader. [grading.py](sql_quiz/grading.py) compares columns, values and requested ordering. The snapshot in `tests/fixtures/` is for offline tests only.
 
+Student drafts and grades are stored in `public.quiz_submissions`, protected by per-user RLS. This table starts empty and does not hold instructor solutions. Login and query execution remain available if progress storage is unavailable.
+
 Student queries use read-only transactions, prepared statements, a 10-second timeout and a 500-row limit. Saved submissions and audit logs are separate from business data and inaccessible to the query reader.
 
 ## Common commands

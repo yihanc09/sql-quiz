@@ -25,6 +25,17 @@ SESSIONS = {}
 SESSION_LOCK = threading.Lock()
 
 
+def load_progress(client, user_id):
+    """Progress storage must never decide whether a valid login is accepted."""
+    try:
+        return {"records": load_answer_records(client, user_id)}
+    except Exception:
+        return {
+            "records": {},
+            "warning": "You are signed in, but saved submissions could not be loaded. You can still run SQL; saving may be unavailable. Please retry later.",
+        }
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         # Never log submitted SQL, credentials, or URL parameters.
@@ -96,8 +107,10 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 with session["lock"]:
                     user = session["client"].auth.get_user().user
-                    records = load_answer_records(session["client"], user.id)
-                return self.reply(200, {"user": {"email": user.email}, "records": records})
+                    if not user:
+                        raise ValueError("Session user unavailable")
+                    progress = load_progress(session["client"], user.id)
+                return self.reply(200, {"user": {"email": user.email}, **progress})
             except Exception:
                 return self.reply(401, {"error": "Your session could not be verified. Please sign in again."})
         files = {"/": ("index.html", "text/html; charset=utf-8"),
@@ -149,16 +162,16 @@ class Handler(BaseHTTPRequestHandler):
                     return self.reply(401, {"error": "Please confirm your email before signing in."})
                 client = get_supabase_client()
                 client.auth.set_session(response.session.access_token, response.session.refresh_token)
-                records = load_answer_records(client, response.user.id)
+                progress = load_progress(client, response.user.id)
                 if is_vercel():
-                    return self.reply(200, {"user": {"email": response.user.email}, "records": records},
+                    return self.reply(200, {"user": {"email": response.user.email}, **progress},
                                       self.encrypted_cookie(client.auth.get_session()))
                 sid = secrets.token_urlsafe(32)
                 old_sid, _ = self.session()
                 with SESSION_LOCK:
                     SESSIONS.pop(old_sid, None)
                     SESSIONS[sid] = {"client": client, "expires": time.time() + SESSION_TTL, "lock": threading.Lock()}
-                return self.reply(200, {"user": {"email": response.user.email}, "records": records},
+                return self.reply(200, {"user": {"email": response.user.email}, **progress},
                                   f"quiz_session={sid}; HttpOnly; SameSite=Strict; Path=/; Max-Age={SESSION_TTL}")
             except RuntimeConfigError as exc:
                 return self.reply(503, {"error": str(exc)})

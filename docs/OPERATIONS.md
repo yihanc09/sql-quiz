@@ -56,6 +56,19 @@ Use `public.` table names. Run a query to inspect results, optionally show the r
 
 Local sessions use an HttpOnly, SameSite cookie and process memory, with a 12-hour expiration. Restarting the listener clears local sessions. Vercel uses encrypted HttpOnly, Secure, SameSite cookies, allowing another function instance to restore the session. Saved answers and grades remain in Supabase.
 
+## Student submission storage and login recovery
+
+The application stores new student drafts and grades in `public.quiz_submissions`. This is empty application storage, not an instructor-answer dataset. It has ownership RLS, a user/question unique key, and audit/timestamp triggers. The removed `quiz_answers` table is not recreated and deleted records are not recovered.
+
+For this project's existing Auth/audit setup:
+
+```bash
+python -m scripts.configure_submissions --apply
+python -m scripts.configure_submissions --check
+```
+
+The first command applies `sql/003_submission_storage.sql`; the second checks permissions without writes. Authentication is independent of loading submission records: unavailable progress storage produces a warning, while a valid user can still log in and run SQL. Saving/grading persistence can fail separately until storage is repaired.
+
 ## Business data and live references
 
 All 11 uploaded business tables are in `public`. `data/chinook/` contains the CSVs and `data/schema.json` defines types, keys, nullability and expected row counts.

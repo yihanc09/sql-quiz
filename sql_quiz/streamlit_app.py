@@ -112,9 +112,9 @@ else:
     if st.session_state.get("loaded_user_id") != verified.user.id:
         try:
             records = load_answer_records(client, verified.user.id)
-        except Exception as exc:
-            st.error(f"Could not load saved answers: {exc}")
-            st.stop()
+        except Exception:
+            records = {}
+            st.warning("You are signed in, but saved submissions could not be loaded. You can still run SQL; saving may be unavailable.")
         reset_quiz_state()
         st.session_state.grades = {}
         for qid in IDS:

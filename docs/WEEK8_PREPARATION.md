@@ -14,7 +14,7 @@ On October 21, 2026, read-only checks against the existing Supabase project conf
 - The first preparation validation passed 64 offline tests and 20 hosted database/security tests. The subsequent public-table linking has separate verification described in [LIVE_TABLE_LINKING.md](LIVE_TABLE_LINKING.md). The new bootstrap write path was not executed against the shared database.
 - Q3's grading now enforces its requested alphabetical order, instead of accepting arbitrary genre ordering.
 
-The original standard SQL and expected results are legitimate grading fixtures. They do not need to be deleted. The student's `public.quiz_answers` rows are saved submissions, not business data. Neither should be used as the source of truth for schema retrieval.
+The original standard SQL and expected results are legitimate grading fixtures. They do not need to be deleted. Student submissions belong in `public.quiz_submissions`, separate from business data. The deleted legacy `quiz_answers` table is no longer used. Neither should be used as the source of truth for schema retrieval.
 
 ## Separate the three kinds of data
 
