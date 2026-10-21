@@ -18,6 +18,8 @@ from sql_quiz.dataset import SCHEMA
 from sql_quiz.quiz import get_questions, get_total_points
 from sql_quiz.web_sessions import SESSION_TTL, is_vercel, session_cipher, encode_session, decode_session
 from sql_quiz.runtime_config import RuntimeConfigError
+from sql_quiz.retrieval import retrieve_knowledge, RetrievalUnavailable
+from sql_quiz.generation import generate_sql, GenerationUnavailable
 
 from sql_quiz.paths import FRONTEND_DIR as ROOT
 QUESTIONS = {q["id"]: q for q in get_questions()}
@@ -197,8 +199,26 @@ class Handler(BaseHTTPRequestHandler):
                     SESSIONS.pop(sid, None)
                 secure = " Secure;" if is_vercel() else ""
                 return self.reply(200, {"ok": True}, f"quiz_session=; HttpOnly;{secure} SameSite=Strict; Path=/; Max-Age=0")
-            if path not in ("/api/save", "/api/run", "/api/submit", "/api/hint"):
+            if path not in ("/api/save", "/api/run", "/api/submit", "/api/hint", "/api/retrieve", "/api/generate"):
                 return self.reply(404, {"error": "Not found."})
+            if path == "/api/retrieve":
+                try:
+                    return self.reply(200, retrieve_knowledge(data.get("question"), data.get("top_k", 5)))
+                except ValueError as exc:
+                    return self.reply(400, {"error": str(exc)})
+                except RetrievalUnavailable as exc:
+                    return self.reply(503, {"error": str(exc)})
+                except Exception:
+                    return self.reply(503, {"error": "Vector retrieval is unavailable. Check the configured Chroma backend."})
+            if path == "/api/generate":
+                try:
+                    return self.reply(200, generate_sql(data.get("question"), data.get("top_k", 5)))
+                except ValueError as exc:
+                    return self.reply(400, {"error": str(exc)})
+                except (RetrievalUnavailable, GenerationUnavailable) as exc:
+                    return self.reply(503, {"error": str(exc)})
+                except Exception:
+                    return self.reply(503, {"error": "SQL generation is unavailable. Check the AI API and Chroma configuration."})
             qid, sql = data.get("question_id"), data.get("sql", "")
             if path == "/api/hint":
                 if type(qid) is not int or qid not in QUESTIONS:

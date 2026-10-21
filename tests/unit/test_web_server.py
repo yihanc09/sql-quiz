@@ -203,3 +203,62 @@ def test_invalid_credentials_do_not_create_session(api_request, monkeypatch):
     result = api_request('/api/login', {'email': 'student@example.com', 'password': 'wrong'}, False)
     assert result[0] == 400 and len(result) == 2
     assert set(web.SESSIONS) == original
+
+
+def test_vector_retrieval_requires_verified_login(api_request, monkeypatch):
+    search = Mock()
+    monkeypatch.setattr(web,'retrieve_knowledge',search)
+    assert api_request('/api/retrieve',{'question':'How many artists?'},False)[0] == 401
+    search.assert_not_called()
+
+
+def test_vector_search_returns_sources_without_running_sql(api_request, monkeypatch):
+    payload = {'question':'artist count','model':'all-MiniLM-L6-v2','embedding_dimensions':384,
+               'results':[{'id':'schema.artist','text':'Artist schema','metadata':{'source':'data/schema.json'},'distance':0.2}]}
+    search, execute = Mock(return_value=payload), Mock()
+    monkeypatch.setattr(web,'retrieve_knowledge',search)
+    monkeypatch.setattr(web,'run_query',execute)
+    assert api_request('/api/retrieve',{'question':'artist count','top_k':3}) == (200,payload)
+    search.assert_called_once_with('artist count',3)
+    execute.assert_not_called()
+
+
+def test_retrieval_unavailable_is_not_a_login_failure(api_request, monkeypatch):
+    monkeypatch.setattr(web,'retrieve_knowledge',Mock(side_effect=web.RetrievalUnavailable('Run indexing first.')))
+    status,payload = api_request('/api/retrieve',{'question':'artists'})
+    assert status == 503 and payload['error'] == 'Run indexing first.'
+    assert api_request('/api/session')[1]['user'] is not None
+
+
+def test_retrieval_internal_details_not_exposed(api_request, monkeypatch):
+    monkeypatch.setattr(web,'retrieve_knowledge',Mock(side_effect=RuntimeError('private path or token')))
+    status,payload = api_request('/api/retrieve',{'question':'artists'})
+    assert status == 503 and 'private path' not in payload['error']
+
+
+@pytest.mark.parametrize("authenticated, expected", [(False, 401), (True, 200)])
+def test_generation_auth_and_no_execution(api_request, monkeypatch, authenticated, expected):
+    generate = Mock(return_value={"sql": "SELECT 1", "retrieval": {"results": []}, "executed": False})
+    execute = Mock()
+    monkeypatch.setattr(web, "generate_sql", generate)
+    monkeypatch.setattr(web, "run_query", execute)
+    status, payload = api_request("/api/generate", {"question": "Count artists"}, authenticated)
+    assert status == expected
+    execute.assert_not_called()
+    if authenticated:
+        generate.assert_called_once_with("Count artists", 5)
+        assert payload["executed"] is False
+    else:
+        generate.assert_not_called()
+
+
+def test_generation_error_keeps_route_actionable(api_request, monkeypatch):
+    monkeypatch.setattr(web, "generate_sql", Mock(side_effect=web.GenerationUnavailable("Set OPENAI_API_KEY")))
+    status, payload = api_request("/api/generate", {"question": "Count artists"})
+    assert status == 503 and payload["error"] == "Set OPENAI_API_KEY"
+
+
+def test_generation_unexpected_error_is_sanitized(api_request, monkeypatch):
+    monkeypatch.setattr(web, "generate_sql", Mock(side_effect=RuntimeError("private-provider-token")))
+    status, payload = api_request("/api/generate", {"question": "Count artists"})
+    assert status == 503 and "private-provider-token" not in payload["error"]
