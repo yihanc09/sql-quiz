@@ -16,7 +16,7 @@ from sql_quiz.paths import PROJECT_ROOT, KNOWLEDGE_PATH
 MODEL_NAME = 'all-MiniLM-L6-v2'
 DIMENSIONS = 384
 COLLECTION_NAME = 'chinook_knowledge_minilm_v1'
-INDEX_COMMAND = '.venv/bin/python -m scripts.index_knowledge'
+INDEX_COMMAND = '.venv/bin/python -m scripts.rag.index_knowledge'
 
 
 class RetrievalUnavailable(RuntimeError):
@@ -154,7 +154,7 @@ def local_store(create=False):
         return KnowledgeStore(_local_client(str(path.resolve())), _local_embedder(),
                               collection_name=os.getenv('CHROMA_COLLECTION', COLLECTION_NAME))
     except ImportError:
-        raise RetrievalUnavailable('Install local retrieval dependencies with .venv/bin/python -m pip install -r requirements-rag.txt.') from None
+        raise RetrievalUnavailable('Install local retrieval dependencies with .venv/bin/python -m pip install -r requirements/local.txt.') from None
 
 
 def configured_store(create=False):

@@ -40,10 +40,10 @@ def _private_settings():
     except psycopg.Error:
         raise RuntimeConfigError(
             "Cannot load private configuration. Check DATABASE_URL / DATABASE_PASSWORD "
-            "and run python -m scripts.configure_runtime --init once."
+            "and run python -m scripts.admin.configure_runtime --init once."
         ) from None
     if not row or not isinstance(row[0], dict):
-        raise RuntimeConfigError("Run python -m scripts.configure_runtime --init once to initialize private settings.")
+        raise RuntimeConfigError("Run python -m scripts.admin.configure_runtime --init once to initialize private settings.")
     return row[0]
 
 
@@ -53,5 +53,5 @@ def get_setting(name):
         raise RuntimeConfigError("Unknown private configuration setting.")
     value = os.getenv(name) or _private_settings().get(name)
     if not isinstance(value, str) or not value.strip():
-        raise RuntimeConfigError("Private configuration is incomplete. Run python -m scripts.configure_runtime --init.")
+        raise RuntimeConfigError("Private configuration is incomplete. Run python -m scripts.admin.configure_runtime --init.")
     return value

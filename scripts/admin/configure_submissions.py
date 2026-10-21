@@ -12,7 +12,7 @@ from sql_quiz.runtime_config import backend_connection
 def check_storage(conn):
     exists = conn.execute("SELECT to_regclass('public.quiz_submissions') IS NOT NULL").fetchone()[0]
     if not exists:
-        raise ValueError('Run python -m scripts.configure_submissions --apply first.')
+        raise ValueError('Run python -m scripts.admin.configure_submissions --apply first.')
     checks = []
     for role in ('quiz_reader', 'anon'):
         for privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'):

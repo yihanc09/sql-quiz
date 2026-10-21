@@ -13,10 +13,10 @@ def main():
         store._check_model(metadata)
         _, fingerprint = load_corpus()
         if metadata.get('ready') is not True or metadata.get('corpus_sha256') != fingerprint:
-            raise RetrievalUnavailable('Cloud index is stale or incomplete; rerun scripts.index_knowledge --cloud.')
+            raise RetrievalUnavailable('Cloud index is stale or incomplete; rerun scripts.rag.index_knowledge --cloud.')
         count = collection.count()
         if not count:
-            raise RetrievalUnavailable('Cloud index is empty; run scripts.index_knowledge --cloud.')
+            raise RetrievalUnavailable('Cloud index is empty; run scripts.rag.index_knowledge --cloud.')
         print(json.dumps({'backend': 'cloud', 'collection': store.collection_name,
                           'model': store.model_name, 'dimensions': store.dimensions,
                           'indexed_documents': count, 'ready': True}, indent=2))

@@ -6,7 +6,7 @@ import pytest
 
 import sql_quiz.auth as auth
 import sql_quiz.database as database
-import scripts.audit_admin as audit_admin
+import scripts.admin.audit_admin as audit_admin
 import psycopg
 
 

@@ -101,7 +101,7 @@ def test_missing_session_key_returns_actionable_configuration_error(vercel):
     instance = request("/api/login", {"email": "student@example.com", "password": "test"})
     instance.do_POST()
     assert instance.reply.call_args.args[0] == 503
-    assert "-m scripts.configure_runtime --init" in instance.reply.call_args.args[1]["error"]
+    assert "-m scripts.admin.configure_runtime --init" in instance.reply.call_args.args[1]["error"]
     login.assert_not_called()
 
 

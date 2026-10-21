@@ -2,7 +2,7 @@
 
 import json
 
-from scripts.build_knowledge import OUTPUT, build_documents
+from scripts.data.build_knowledge import OUTPUT, build_documents
 from sql_quiz.dataset import TABLES
 
 def test_knowledge_is_current_and_excludes_quiz_answers_and_user_records():

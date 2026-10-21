@@ -89,4 +89,4 @@ def cloud_store():
                           collection_name=os.getenv('CHROMA_CLOUD_COLLECTION', CLOUD_COLLECTION),
                           model_name=CLOUD_MODEL, dimensions=CLOUD_DIMENSIONS,
                           configuration={'spann': {'space': 'cosine'}}, backend='cloud',
-                          index_command='.venv/bin/python -m scripts.index_knowledge --cloud')
+                          index_command='.venv/bin/python -m scripts.rag.index_knowledge --cloud')

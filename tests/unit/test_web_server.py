@@ -98,7 +98,7 @@ def test_logout_clears_local_session(api_request):
 
 
 def test_missing_private_configuration_is_not_reported_as_invalid_login(api_request, monkeypatch):
-    message = "Run python -m scripts.configure_runtime --init once to initialize private settings."
+    message = "Run python -m scripts.admin.configure_runtime --init once to initialize private settings."
     monkeypatch.setattr(web, "sign_in", Mock(side_effect=web.RuntimeConfigError(message)))
     status, payload = api_request("/api/login", {"email": "student@example.com", "password": "test"}, False)
     assert status == 503

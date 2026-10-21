@@ -1,1 +1,1 @@
-"""Maintenance commands. Run from the repository root with python -m scripts.<name>."""
+"""Maintenance tools grouped into admin, data and rag command packages."""
