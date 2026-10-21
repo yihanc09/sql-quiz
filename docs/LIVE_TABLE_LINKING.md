@@ -67,12 +67,12 @@ Sign in, open a question, and select **Show expected SQL & live result**. Type a
 
 Validation completed:
 
-- **76 offline tests passed**, including changing live reference values, authentication for hints, no static fallback, no grade save on reference failure, and shared 11-table metadata.
+- **78 offline tests passed**, including changing live reference values, authentication for hints, no static fallback, no grade save on reference failure, and shared 11-table metadata.
 - **36 hosted database/security tests passed**, including all five reference queries and all 11 table counts through the restricted reader. Current reference outputs have 1, 5, 25, 5, and 5 rows respectively.
 - All 15,607 uploaded rows match the CSVs after normalization.
 - JavaScript syntax and a lightweight frontend behavior check passed for displaying 11 tables, rendering live hints, preserving the editor draft, and escaping displayed SQL. No browser was available for visual layout verification in this session.
 
-The Actions workflow includes the new checks, but a new GitHub run and the public site require committing/pushing and deploying these local code changes. The database changes above are already applied; the Vercel code has not been redeployed in this session.
+The Actions workflow includes these checks. The canonical source and the connected `yihanc09/sql-quiz` deployment repository are synchronized with separate English commits. Both workflows require their own reader-only `QUIZ_DATABASE_URL` Secret. The database configuration is already applied; pushing the deployment repository triggers Vercel. Consult Actions and Vercel for the current run status.
 
 ## RAG follow-up
 

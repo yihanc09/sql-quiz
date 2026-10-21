@@ -78,7 +78,7 @@ See [live-table linking](LIVE_TABLE_LINKING.md) for details and concurrency limi
 
 ## Deploy to Vercel
 
-Import `yihanc09/sql-quiz`, branch `main`, with the repository root as Root Directory. The configured entrypoint remains:
+The canonical source is `yihanc09/IDS706-SQL-Quiz`. The existing Vercel project is connected to `yihanc09/sql-quiz`, branch `main`, with the repository root as Root Directory. Synchronize application changes to that deployment repository to update the public website. The configured entrypoint remains:
 
 ```toml
 [tool.vercel]
@@ -107,7 +107,7 @@ python -m pytest tests/unit tests/integration -v  # Both suites
 
 Pytest configuration is in `pyproject.toml`; caches go in ignored `.cache/pytest/`. Integration tests require the configured reader connection, either from private settings or a `QUIZ_DATABASE_URL` environment override.
 
-[GitHub Actions](../.github/workflows/test.yml) has two separate jobs. The unit job runs `tests/unit`; the database job runs `tests/integration` and reads `QUIZ_DATABASE_URL` from GitHub Secrets. Administrator credentials are not required in CI. Check the actual workflow run before reporting GitHub status.
+[GitHub Actions](../.github/workflows/test.yml) has two separate jobs. The unit job runs `tests/unit`; the database job runs `tests/integration` and reads `QUIZ_DATABASE_URL` from GitHub Secrets. Administrator credentials are not required in CI. Repository Secrets are scoped independently: configure the restricted `QUIZ_DATABASE_URL` in both repositories when running both live integration workflows. The deployment repository has this reader-only Secret configured as well. Check the actual workflow run before reporting GitHub status.
 
 ## SQL execution and audit integrity
 

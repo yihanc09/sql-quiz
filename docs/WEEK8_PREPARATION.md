@@ -93,7 +93,7 @@ Expose retrieval evidence (source IDs or table names) beside generated SQL so th
 - If implementing extra credit, show executed results and comparison with the matching selected quiz question; do not grade arbitrary natural-language questions against an unrelated quiz answer.
 - Update the README with the actual provider, retrieval/deployment instructions, and screenshots; push and verify CI on GitHub.
 
-The existing public app URL in the main README is the Week 7 deployment. These local preparation changes have not been deployed.
+The public URL in the main README hosts the SQL quiz, deployed through the synchronized `yihanc09/sql-quiz` repository. The retrieval corpus is preparation only and does not yet provide a RAG generation feature.
 
 ## Deployment references
 
