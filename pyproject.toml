@@ -10,6 +10,8 @@ dependencies = [
     "pandas",
     "python-dotenv",
     "cryptography",
+    "httpx>=0.27,<1",
+    "chromadb-client==1.5.9",
 ]
 
 [tool.uv]

@@ -1,7 +1,3 @@
-streamlit
-supabase
-psycopg[binary]
-pandas
-python-dotenv
-pytest
-cryptography
+# Deployment/cloud runtime: use the HTTP-only Chroma distribution.
+-r requirements-core.txt
+chromadb-client==1.5.9

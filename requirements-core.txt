@@ -1,0 +1,8 @@
+streamlit
+supabase
+psycopg[binary]
+pandas
+python-dotenv
+pytest
+cryptography
+httpx>=0.27,<1

@@ -9,6 +9,7 @@ __pycache__/
 .pytest_cache/
 .cache/
 .venv/
+.venv-cloud/
 venv/
 
 # Local R session history
