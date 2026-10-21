@@ -1,0 +1,49 @@
+name: SQL Quiz CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: python -m pytest tests/test_quiz.py tests/test_grading.py tests/test_web_server.py tests/test_audit.py tests/test_vercel.py tests/test_runtime_config.py -v
+
+  database-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run PostgreSQL integration and security tests
+        env:
+          QUIZ_DATABASE_URL: ${{ secrets.QUIZ_DATABASE_URL }}
+        run: python -m pytest tests/test_database_connection.py tests/test_sql_security.py -v

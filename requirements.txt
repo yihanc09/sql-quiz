@@ -4,3 +4,4 @@ psycopg[binary]
 pandas
 python-dotenv
 pytest
+cryptography

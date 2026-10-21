@@ -97,3 +97,11 @@ def test_logout_clears_local_session(api_request):
     status, _, cookie = api_request("/api/logout", {})
     assert status == 200 and "Max-Age=0" in cookie
     assert not web.SESSIONS
+
+
+def test_missing_private_configuration_is_not_reported_as_invalid_login(api_request, monkeypatch):
+    message = "Run python configure_runtime.py --init once to initialize private settings."
+    monkeypatch.setattr(web, "sign_in", Mock(side_effect=web.RuntimeConfigError(message)))
+    status, payload = api_request("/api/login", {"email": "student@example.com", "password": "test"}, False)
+    assert status == 503
+    assert payload["error"] == message

@@ -1,19 +1,15 @@
 """Supabase authentication and per-user quiz answer persistence."""
-import os
 from dotenv import load_dotenv
 from supabase import create_client
 
 from database import get_connection
+from runtime_config import get_setting
 
 load_dotenv()
 
 
 def get_supabase_client():
-    url = os.getenv("SUPABASE_URL")
-    key = os.getenv("SUPABASE_ANON_KEY")
-    if not url or not key:
-        raise ValueError("SUPABASE_URL and SUPABASE_ANON_KEY must be configured.")
-    return create_client(url, key)
+    return create_client(get_setting("SUPABASE_URL"), get_setting("SUPABASE_ANON_KEY"))
 
 
 def sign_up(email, password):

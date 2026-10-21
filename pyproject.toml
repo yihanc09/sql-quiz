@@ -1,0 +1,20 @@
+[project]
+name = "ids706-sql-quiz"
+version = "0.1.0"
+requires-python = ">=3.12"
+# Only backend runtime dependencies are installed by the Vercel build.
+# requirements.txt also includes the local Streamlit interface and test runner.
+dependencies = [
+    "supabase",
+    "psycopg[binary]",
+    "pandas",
+    "python-dotenv",
+    "cryptography",
+]
+
+[tool.uv]
+package = false
+
+[tool.vercel]
+# app.py is the original Streamlit UI, not the HTTP application.
+entrypoint = "web_server:handler"

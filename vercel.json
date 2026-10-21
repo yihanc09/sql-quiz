@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "web_server.py": {
+      "maxDuration": 60,
+      "excludeFiles": "{tests/**,.env,.env.*,sql/**,audit_admin.py,configure_runtime.py,.Rhistory,.pytest_cache/**,__pycache__/**}"
+    }
+  }
+}

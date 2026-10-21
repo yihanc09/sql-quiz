@@ -1,23 +1,15 @@
-import os
-
 import pandas as pd
 import psycopg
-from dotenv import load_dotenv
-
-# Load environment variables from .env
-load_dotenv()
+from runtime_config import backend_connection, get_setting
 
 
 def get_connection(read_only=True):
     """Connect to Supabase PostgreSQL."""
 
-    env_name = "QUIZ_DATABASE_URL" if read_only else "DATABASE_URL"
-    database_url = os.getenv(env_name)
-
-    if not database_url:
-        raise ValueError(f"{env_name} is not configured.")
-
-    return psycopg.connect(database_url, connect_timeout=10)
+    if read_only:
+        # Never apply the administrator's password to the independent reader URL.
+        return psycopg.connect(get_setting("QUIZ_DATABASE_URL"), connect_timeout=10)
+    return backend_connection()
 
 
 def run_query(sql, params=None):
