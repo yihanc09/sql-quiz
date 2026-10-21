@@ -1,4 +1,4 @@
-[![SQL Quiz CI](https://github.com/yihanc09/IDS706-SQL-Quiz/actions/workflows/test.yml/badge.svg)](https://github.com/yihanc09/IDS706-SQL-Quiz/actions/workflows/test.yml)
+[![SQL Quiz CI](https://github.com/yihanc09/sql-quiz/actions/workflows/test.yml/badge.svg)](https://github.com/yihanc09/sql-quiz/actions/workflows/test.yml)
 
 # IDS706 SQL Quiz
 
@@ -162,7 +162,7 @@ Open the URL printed in the terminal, usually [http://localhost:8501](http://loc
 
 ## Deploying to Vercel
 
-Import **`yihanc09/IDS706-SQL-Quiz`**, branch `main`, with the repository root as the Root Directory. If an existing Vercel project is linked to a different repository, change its Git connection or import this repository as a new project; a push here will not update a project linked to `sql-quiz`.
+Import **`yihanc09/sql-quiz`**, branch `main`, with the repository root as the Root Directory. This is the Vercel deployment repository, synchronized from [IDS706-SQL-Quiz](https://github.com/yihanc09/IDS706-SQL-Quiz). Keep the Vercel Git connection pointed at `sql-quiz`; source-repository updates need to be synchronized here before they can trigger a deployment.
 
 The deployment entrypoint is configured in `pyproject.toml`:
 
@@ -358,7 +358,7 @@ The administrator integrity command runs explicitly outside CI. Administrator da
 ## Project Structure
 
 ```text
-IDS706-SQL-Quiz/
+sql-quiz/
 ├── .github/
 │   └── workflows/
 │       └── test.yml
