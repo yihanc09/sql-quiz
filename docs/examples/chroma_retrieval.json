@@ -1,0 +1,60 @@
+{
+  "question": "What is the average track duration in minutes for each genre?",
+  "collection": "chinook_knowledge_minilm_v1",
+  "model": "all-MiniLM-L6-v2",
+  "embedding_dimensions": 384,
+  "metric": "cosine",
+  "indexed_documents": 17,
+  "corpus_sha256": "b257cfa45ec3afc8823c5e81126ec4ca3ba8525bf9abce5394f312e181f427cb",
+  "results": [
+    {
+      "id": "semantics.duration",
+      "text": "Track duration is track.milliseconds. Divide by 60000.0 to get minutes. Use ROUND(AVG(milliseconds) / 60000.0, 2) for a two-decimal average. Some genres contain video or TV content and can have long durations.",
+      "metadata": {
+        "kind": "semantics",
+        "source": "scripts/build_knowledge.py"
+      },
+      "distance": 0.22085148096084595
+    },
+    {
+      "id": "schema.track",
+      "text": "PostgreSQL table public.track: Catalog tracks; duration is in milliseconds, price is per track. Includes video content.\nColumns:\n- track_id: bigint, required\n- name: text, required\n- album_id: bigint, nullable\n- media_type_id: bigint, required\n- genre_id: bigint, nullable\n- composer: text, nullable\n- milliseconds: bigint, required\n- bytes: bigint, nullable\n- unit_price: numeric(10,2), required\nPrimary key: track_id\nJoin public.track.album_id = public.album.album_id\nJoin public.track.media_type_id = public.media_type.media_type_id\nJoin public.track.genre_id = public.genre.genre_id",
+      "metadata": {
+        "table": "public.track",
+        "source": "data/schema.json",
+        "kind": "schema"
+      },
+      "distance": 0.4890386462211609
+    },
+    {
+      "id": "schema.genre",
+      "text": "PostgreSQL table public.genre: Music and video categories for tracks.\nColumns:\n- genre_id: bigint, required\n- name: text, nullable\nPrimary key: genre_id",
+      "metadata": {
+        "source": "data/schema.json",
+        "table": "public.genre",
+        "kind": "schema"
+      },
+      "distance": 0.605039119720459
+    },
+    {
+      "id": "schema.playlist_track",
+      "text": "PostgreSQL table public.playlist_track: Many-to-many playlist membership; a track may appear in multiple playlists.\nColumns:\n- playlist_id: bigint, required\n- track_id: bigint, required\nPrimary key: playlist_id, track_id\nJoin public.playlist_track.playlist_id = public.playlist.playlist_id\nJoin public.playlist_track.track_id = public.track.track_id",
+      "metadata": {
+        "table": "public.playlist_track",
+        "kind": "schema",
+        "source": "data/schema.json"
+      },
+      "distance": 0.652226448059082
+    },
+    {
+      "id": "schema.media_type",
+      "text": "PostgreSQL table public.media_type: Track file formats such as MPEG audio and video.\nColumns:\n- media_type_id: bigint, required\n- name: text, nullable\nPrimary key: media_type_id",
+      "metadata": {
+        "kind": "schema",
+        "source": "data/schema.json",
+        "table": "public.media_type"
+      },
+      "distance": 0.7188524007797241
+    }
+  ]
+}

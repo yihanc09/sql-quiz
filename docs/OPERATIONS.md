@@ -157,4 +157,12 @@ Keep backend credentials and submitted SQL secrets private. Administrators can c
 python -m scripts.build_knowledge
 ```
 
-This rebuilds `knowledge/documents.jsonl` from schema metadata and curated business rules/examples. It does not create embeddings, a vector index or an AI endpoint. See [Week 8 preparation](WEEK8_PREPARATION.md) for the remaining requirements and deployment considerations.
+This rebuilds `knowledge/documents.jsonl` from schema metadata and curated business rules/examples. To create and query the actual local vector index, install the optional Python 3.12 environment and run:
+
+```bash
+.venv/bin/python -m scripts.index_knowledge
+.venv/bin/python -m scripts.search_knowledge "What is the average track duration for each genre?"
+.venv/bin/python web_server.py --port 8001
+```
+
+See [local Chroma setup](CHROMA_LOCAL.md) for installation and the retrieval inspector. Local retrieval and authenticated OpenAI generation are implemented; see [AI generation setup](AI_SQL_GENERATION.md). Chroma Cloud retrieval is now verified; see [cloud configuration](CHROMA_CLOUD.md). Public RAG deployment remains next. See [Week 8 preparation](WEEK8_PREPARATION.md) for remaining requirements.

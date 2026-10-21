@@ -1,0 +1,66 @@
+{
+  "question": "What is the average track duration in minutes for each genre? Return genre_name and avg_minutes rounded to 2 decimal places, ordered by genre_name.",
+  "sql": "SELECT genre.name AS genre_name, ROUND(AVG(track.milliseconds) / 60000.0, 2) AS avg_minutes\nFROM public.track\nJOIN public.genre ON track.genre_id = genre.genre_id\nGROUP BY genre.name\nORDER BY genre_name\nLIMIT 100;",
+  "model": "gpt-4.1-mini",
+  "retrieval": {
+    "question": "What is the average track duration in minutes for each genre? Return genre_name and avg_minutes rounded to 2 decimal places, ordered by genre_name.",
+    "collection": "chinook_knowledge_openai3small_v1",
+    "backend": "cloud",
+    "model": "text-embedding-3-small",
+    "embedding_dimensions": 1536,
+    "metric": "cosine",
+    "indexed_documents": 17,
+    "corpus_sha256": "b257cfa45ec3afc8823c5e81126ec4ca3ba8525bf9abce5394f312e181f427cb",
+    "results": [
+      {
+        "id": "semantics.duration",
+        "text": "Track duration is track.milliseconds. Divide by 60000.0 to get minutes. Use ROUND(AVG(milliseconds) / 60000.0, 2) for a two-decimal average. Some genres contain video or TV content and can have long durations.",
+        "metadata": {
+          "source": "scripts/build_knowledge.py",
+          "kind": "semantics"
+        },
+        "distance": 0.31808257
+      },
+      {
+        "id": "schema.track",
+        "text": "PostgreSQL table public.track: Catalog tracks; duration is in milliseconds, price is per track. Includes video content.\nColumns:\n- track_id: bigint, required\n- name: text, required\n- album_id: bigint, nullable\n- media_type_id: bigint, required\n- genre_id: bigint, nullable\n- composer: text, nullable\n- milliseconds: bigint, required\n- bytes: bigint, nullable\n- unit_price: numeric(10,2), required\nPrimary key: track_id\nJoin public.track.album_id = public.album.album_id\nJoin public.track.media_type_id = public.media_type.media_type_id\nJoin public.track.genre_id = public.genre.genre_id",
+        "metadata": {
+          "kind": "schema",
+          "table": "public.track",
+          "source": "data/schema.json"
+        },
+        "distance": 0.5737884
+      },
+      {
+        "id": "schema.genre",
+        "text": "PostgreSQL table public.genre: Music and video categories for tracks.\nColumns:\n- genre_id: bigint, required\n- name: text, nullable\nPrimary key: genre_id",
+        "metadata": {
+          "kind": "schema",
+          "table": "public.genre",
+          "source": "data/schema.json"
+        },
+        "distance": 0.5766623
+      },
+      {
+        "id": "semantics.joins",
+        "text": "Artist -> album -> track joins use artist_id then album_id. Track -> genre uses genre_id. Customer -> invoice -> invoice_line -> track joins use customer_id, invoice_id, track_id. playlist_track joins playlist and track; membership is many-to-many. Use LEFT JOIN if zero-match entities must be included; an INNER JOIN excludes them.",
+        "metadata": {
+          "kind": "semantics",
+          "source": "scripts/build_knowledge.py"
+        },
+        "distance": 0.6499366
+      },
+      {
+        "id": "schema.media_type",
+        "text": "PostgreSQL table public.media_type: Track file formats such as MPEG audio and video.\nColumns:\n- media_type_id: bigint, required\n- name: text, nullable\nPrimary key: media_type_id",
+        "metadata": {
+          "table": "public.media_type",
+          "kind": "schema",
+          "source": "data/schema.json"
+        },
+        "distance": 0.69579566
+      }
+    ]
+  },
+  "executed": false
+}

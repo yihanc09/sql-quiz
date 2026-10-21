@@ -17,6 +17,12 @@ Run from the repository root using `python -m scripts.<command>`. Application se
 | `python -m scripts.audit_admin --apply` | Apply audit hardening migration | Writes database |
 | `python -m scripts.audit_admin --recent 20` | Inspect recent audit entries | Database read-only; output includes submitted SQL |
 | `python -m scripts.build_knowledge` | Build the 17 retrieval documents | Writes `knowledge/documents.jsonl` |
+| `.venv/bin/python -m scripts.index_knowledge` | Embed curated documents and synchronize local Chroma | Writes ignored local vector index; first run downloads model |
+| `.venv/bin/python -m scripts.search_knowledge "question"` | Embed a question and retrieve nearest knowledge vectors | Reads local Chroma; returns sources and distances |
+| `.venv/bin/python -m scripts.generate_sql --check-config` | Validate OpenAI environment configuration | Offline; hides key values |
+| `.venv/bin/python -m scripts.generate_sql "question"` | Retrieve Chroma context, then generate SQL with OpenAI | Sends the question and retrieved knowledge to OpenAI; no SQL execution |
+| `.venv/bin/python -m scripts.index_knowledge --cloud` | Embed curated knowledge and index Chroma Cloud | Sends knowledge to OpenAI; writes application cloud collection |
+| `.venv/bin/python -m scripts.check_cloud` | Verify cloud index metadata, corpus and count | Reads Chroma Cloud; no OpenAI calls |
 | `python -m scripts.generate_expected_results` | Export current references for offline tests | Reads database; writes `tests/fixtures/expected_results.json` |
 
 The database commands use the existing `.env`/private settings. Initializing a completely new Supabase project also requires its own Auth setup, answer table/policies and reader credentials; these are maintenance tools for the configured project.

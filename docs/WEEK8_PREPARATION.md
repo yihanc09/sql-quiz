@@ -1,5 +1,9 @@
 # Week 8 preparation and handoff
 
+## Current status
+
+Local ChromaDB retrieval is now implemented and verified over the 17-document corpus using 384-dimensional MiniLM embeddings. See [CHROMA_LOCAL.md](CHROMA_LOCAL.md) for installation, indexing, the web inspector and a real retrieval example. OpenAI SQL generation is implemented and a real local request passed. See [AI_SQL_GENERATION.md](AI_SQL_GENERATION.md). Chroma Cloud indexing and cloud-backed RAG have also passed real CLI requests; see [CHROMA_CLOUD.md](CHROMA_CLOUD.md). Public RAG deployment/verification remain unfinished.
+
 ## What was verified
 
 **Update:** the user subsequently uploaded a new set of tables to `public`. These are now the active source. See [the live-table linking notes](LIVE_TABLE_LINKING.md); the older `chinook` copy remains intact.
@@ -76,24 +80,24 @@ Authenticated natural-language question
 
 The corpus currently contains 17 documents: 11 table documents, four business/rules documents, and two examples different from the five quiz reference queries. Each has a stable ID and source metadata. Do not indiscriminately index the repository: runtime secrets, user answers, audit logs, and grading fixtures are excluded from this corpus.
 
-**This preparation is not a working RAG implementation.** No embeddings, vector index, similarity search, or AI generation endpoint have been added yet. Building documents or adding schema to a prompt alone does not meet the actual vector retrieval requirement.
+**Local RAG is implemented; public RAG deployment is still incomplete.** The application embeds questions, queries Chroma, and calls the OpenAI Responses API through authenticated `/api/generate`. A real local generated response is recorded in `docs/examples/openai_generation.json`.
 
 For the deployed Vercel application, prefer a remote Chroma service (cloud or a separately hosted persistent Chroma server). A local persistent Chroma directory is suitable for development or a persistent server host. Vercel's filesystem does not provide durable shared writes across function instances; writing an index there on every request is not a dependable deployment design. A remote service also avoids bundling local model weights into the current small Python deployment.
 
-Before adding generation, choose an AI provider and embedding model and configure their backend credentials. Use the same embedding model/version/dimensions for ingestion and question retrieval, with reindexing when changed. Keep API keys on the backend in environment variables, never in frontend JavaScript or commits. Remote Chroma credentials must also remain on the backend.
+OpenAI is the selected provider; set backend `OPENAI_API_KEY` and optional `OPENAI_MODEL` as described in the generation guide. The local embedding model is already fixed at all-MiniLM-L6-v2; a future cloud embedding provider may require a new collection and reindexing. Use the same embedding model/version/dimensions for ingestion and question retrieval, with reindexing when changed. Keep API keys on the backend in environment variables, never in frontend JavaScript or commits. Remote Chroma credentials must also remain on the backend.
 
 Expose retrieval evidence (source IDs or table names) beside generated SQL so the pipeline is reviewable. Keep generation behind the existing verified login boundary. Generated SQL must use the existing restricted reader and timeout/row limits if execution is added; never execute it with the backend administrator connection.
 
 ## Still required for this week's final submission
 
-- Build and populate ChromaDB or Neo4j with actual embeddings and similarity retrieval.
+- Configure the verified Chroma Cloud/OpenAI credentials in the deployed site.
 - Connect the selected AI API and add authenticated generation to the deployed web frontend (`frontend/` + `web_server.py`, not just the optional Streamlit UI).
 - Confirm the question -> retrieval -> AI -> SQL flow on the public site.
 - Capture a real screenshot showing a question and its generated SQL.
 - If implementing extra credit, show executed results and comparison with the matching selected quiz question; do not grade arbitrary natural-language questions against an unrelated quiz answer.
 - Update the README with the actual provider, retrieval/deployment instructions, and screenshots; push and verify CI on GitHub.
 
-The public URL in the main README hosts the SQL quiz, deployed through the synchronized `yihanc09/sql-quiz` repository. The retrieval corpus is preparation only and does not yet provide a RAG generation feature.
+The public URL in the main README hosts the SQL quiz, deployed through the synchronized `yihanc09/sql-quiz` repository. Local retrieval and OpenAI generation are implemented; cloud retrieval is also verified locally, and the public site still needs deployment/configuration of the new features.
 
 ## Deployment references
 

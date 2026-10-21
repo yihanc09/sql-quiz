@@ -1,0 +1,66 @@
+{
+  "question": "How many artists are in the Chinook database? Return one column named total_artists.",
+  "sql": "SELECT COUNT(*) AS total_artists FROM public.artist;",
+  "model": "gpt-4.1-mini",
+  "retrieval": {
+    "question": "How many artists are in the Chinook database? Return one column named total_artists.",
+    "collection": "chinook_knowledge_minilm_v1",
+    "model": "all-MiniLM-L6-v2",
+    "embedding_dimensions": 384,
+    "metric": "cosine",
+    "indexed_documents": 17,
+    "corpus_sha256": "b257cfa45ec3afc8823c5e81126ec4ca3ba8525bf9abce5394f312e181f427cb",
+    "results": [
+      {
+        "id": "schema.artist",
+        "text": "PostgreSQL table public.artist: Musicians and bands. One artist can have many albums.\nColumns:\n- artist_id: bigint, required\n- name: text, nullable\nPrimary key: artist_id",
+        "metadata": {
+          "kind": "schema",
+          "table": "public.artist",
+          "source": "data/schema.json"
+        },
+        "distance": 0.4692386984825134
+      },
+      {
+        "id": "schema.album",
+        "text": "PostgreSQL table public.album: Albums belonging to artists. One album can contain many tracks.\nColumns:\n- album_id: bigint, required\n- title: text, required\n- artist_id: bigint, required\nPrimary key: album_id\nJoin public.album.artist_id = public.artist.artist_id",
+        "metadata": {
+          "kind": "schema",
+          "table": "public.album",
+          "source": "data/schema.json"
+        },
+        "distance": 0.4821394085884094
+      },
+      {
+        "id": "schema.track",
+        "text": "PostgreSQL table public.track: Catalog tracks; duration is in milliseconds, price is per track. Includes video content.\nColumns:\n- track_id: bigint, required\n- name: text, required\n- album_id: bigint, nullable\n- media_type_id: bigint, required\n- genre_id: bigint, nullable\n- composer: text, nullable\n- milliseconds: bigint, required\n- bytes: bigint, nullable\n- unit_price: numeric(10,2), required\nPrimary key: track_id\nJoin public.track.album_id = public.album.album_id\nJoin public.track.media_type_id = public.media_type.media_type_id\nJoin public.track.genre_id = public.genre.genre_id",
+        "metadata": {
+          "kind": "schema",
+          "table": "public.track",
+          "source": "data/schema.json"
+        },
+        "distance": 0.5976144671440125
+      },
+      {
+        "id": "semantics.joins",
+        "text": "Artist -> album -> track joins use artist_id then album_id. Track -> genre uses genre_id. Customer -> invoice -> invoice_line -> track joins use customer_id, invoice_id, track_id. playlist_track joins playlist and track; membership is many-to-many. Use LEFT JOIN if zero-match entities must be included; an INNER JOIN excludes them.",
+        "metadata": {
+          "kind": "semantics",
+          "source": "scripts/build_knowledge.py"
+        },
+        "distance": 0.6044797897338867
+      },
+      {
+        "id": "schema.genre",
+        "text": "PostgreSQL table public.genre: Music and video categories for tracks.\nColumns:\n- genre_id: bigint, required\n- name: text, nullable\nPrimary key: genre_id",
+        "metadata": {
+          "table": "public.genre",
+          "source": "data/schema.json",
+          "kind": "schema"
+        },
+        "distance": 0.6176565885543823
+      }
+    ]
+  },
+  "executed": false
+}

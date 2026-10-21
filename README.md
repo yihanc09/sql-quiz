@@ -8,7 +8,7 @@ A 20-point SQL quiz using Supabase PostgreSQL and Supabase Auth. Students sign i
 
 **Public application:** [sql-quiz-jade.vercel.app](https://sql-quiz-jade.vercel.app/)
 
-The main interface uses HTML/CSS/JavaScript and a Python HTTP backend. An optional Streamlit interface shares the same services. Week 8 preparation includes a 17-document retrieval corpus; vector retrieval and AI SQL generation are not implemented yet.
+The main interface uses HTML/CSS/JavaScript and a Python HTTP backend. An optional Streamlit interface shares the same services. Week 8 now includes local ChromaDB retrieval over 17 embedded knowledge documents, and authenticated OpenAI SQL generation in the local web interface. The local flow retrieves relevant knowledge before calling the OpenAI Responses API. See [local Chroma setup](docs/CHROMA_LOCAL.md) and [AI generation setup and usage](docs/AI_SQL_GENERATION.md). Chroma Cloud indexing, remote retrieval, and cloud-backed generation have also passed real requests; see [cloud setup](docs/CHROMA_CLOUD.md). Public RAG deployment remains unfinished.
 
 ## Run locally
 
@@ -20,7 +20,7 @@ python -m pip install -r requirements.txt
 python web_server.py --port 8001
 ```
 
-Open [localhost:8001](http://localhost:8001), sign in, select a question, and write SQL with the `public.` schema prefix. **Run query** shows the result. **Show expected SQL & live result** executes the instructor query. **Submit for grading** compares the current result tables and saves the score.
+Open [localhost:8001](http://localhost:8001), sign in, select a question, and write SQL with the `public.` schema prefix. **Run query** shows the result. **Hint → Reference SQL & expected result → Load live reference** executes the instructor query. **Submit answer** compares the current result tables and saves the score.
 
 The existing project uses `DATABASE_URL` and `DATABASE_PASSWORD` in `.env`. Its remaining settings are stored in the backend-only `quiz_private.runtime_config` table. A fresh project also needs Auth, answer-table policies, and a restricted reader; see [setup and operations](docs/OPERATIONS.md).
 
@@ -42,17 +42,19 @@ IDS706-SQL-Quiz/
 ├── data/
 │   ├── chinook/            # 11 business-data CSVs (15,607 rows)
 │   └── schema.json         # Column types, keys, relationships and expected counts
-├── knowledge/              # Prepared retrieval documents; not a vector database
+├── knowledge/              # Curated documents; local vector index is ignored .chroma/
 ├── sql/                    # Versioned database migrations
 ├── tests/
 │   ├── unit/               # Offline tests
 │   ├── integration/        # Live Supabase and database security tests
+│   ├── vector/             # Native Chroma tests without model downloads
 │   └── fixtures/           # Offline reference-result snapshot
 ├── docs/                   # Structure, setup, live-table linking and RAG preparation
 ├── .github/workflows/      # CI, including database tests using GitHub Secrets
 ├── .env.example            # Configuration template; real .env stays untracked
 ├── pyproject.toml          # Runtime dependencies, Vercel entrypoint, pytest configuration
 ├── requirements.txt        # Runtime plus local Streamlit/test dependencies
+├── requirements-rag.txt    # Optional Chroma development environment
 └── vercel.json             # Function configuration and bundle exclusions
 ```
 
@@ -94,6 +96,7 @@ Maintenance commands and their database effects are documented in [scripts/READM
 - [File structure and editing guide](docs/STRUCTURE.md)
 - [Local setup, deployment, configuration and audit operations](docs/OPERATIONS.md)
 - [Connecting the uploaded tables to live hints and grading](docs/LIVE_TABLE_LINKING.md)
+- [Local ChromaDB setup and real vector retrieval](docs/CHROMA_LOCAL.md)
 - [Week 8 RAG preparation and remaining requirements](docs/WEEK8_PREPARATION.md)
 
 - [Original Week 7 application screenshots](docs/SCREENSHOTS.md)

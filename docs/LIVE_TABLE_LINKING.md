@@ -76,7 +76,7 @@ The Actions workflow includes these checks. The canonical source and the connect
 
 ## RAG follow-up
 
-The prepared 17-document knowledge corpus now describes `public` tables. The five quiz answers and user submissions are not indexed. Vector retrieval and AI SQL generation remain the next implementation phase; this live-table connection does not itself constitute RAG.
+The prepared 17-document knowledge corpus now describes `public` tables. The five quiz answers and user submissions are not indexed. Local Chroma retrieval and OpenAI SQL generation are now implemented (see [AI generation](AI_SQL_GENERATION.md)); this live-table connection does not itself constitute RAG.
 
 ## Recovering after deleting legacy answer storage
 
