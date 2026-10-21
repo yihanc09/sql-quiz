@@ -27,7 +27,7 @@ def sign_out(client):
 def save_answer(client, user_id, question_id, sql_answer):
     """Save a draft; clear any previous grade for that answer."""
     return (
-        client.table("quiz_answers")
+        client.table("quiz_submissions")
         .upsert(
             {
                 "user_id": user_id,
@@ -45,7 +45,7 @@ def save_answer(client, user_id, question_id, sql_answer):
 def save_graded_answer(client, user_id, question_id, sql_answer, score, is_correct):
     """Persist SQL and its grade in the same upsert operation."""
     return (
-        client.table("quiz_answers")
+        client.table("quiz_submissions")
         .upsert(
             {
                 "user_id": user_id,
@@ -63,7 +63,7 @@ def save_graded_answer(client, user_id, question_id, sql_answer, score, is_corre
 def load_answer_records(client, user_id):
     """Return per-question SQL and saved grade for the authenticated user."""
     response = (
-        client.table("quiz_answers")
+        client.table("quiz_submissions")
         .select("question_id,sql_answer,score,is_correct")
         .eq("user_id", user_id)
         .execute()

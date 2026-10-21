@@ -33,7 +33,7 @@ def test_multiple_statements_blocked():
 
 def test_answer_table_not_readable():
     with pytest.raises(Exception):
-        run_query("SELECT * FROM public.quiz_answers")
+        run_query("SELECT * FROM public.quiz_submissions")
 
 
 @pytest.mark.parametrize("privilege", ["SELECT", "INSERT", "UPDATE", "DELETE"])

@@ -61,7 +61,7 @@ def check_integrity(conn, taker_role, taker_conn):
     ).fetchone()
     checks.append(("Audit table has RLS enabled", bool(row and row[0])))
     for table, trigger in (
-        ("public.quiz_answers", "trg_quiz_answer_audit"),
+        ("public.quiz_submissions", "trg_quiz_answer_audit"),
         (TABLE, "trg_quiz_audit_no_edit"),
         (TABLE, "trg_quiz_audit_no_truncate"),
     ):

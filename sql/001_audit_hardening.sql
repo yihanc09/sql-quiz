@@ -66,10 +66,17 @@ REVOKE ALL ON FUNCTION public.record_quiz_query_event(integer, text, boolean) FR
 GRANT EXECUTE ON FUNCTION public.record_quiz_query_event(integer, text, boolean) TO authenticated;
 
 -- Audit writes must be part of the same transaction as the saved answer.
-DROP TRIGGER IF EXISTS trg_quiz_answer_audit ON public.quiz_answers;
-CREATE TRIGGER trg_quiz_answer_audit
-AFTER INSERT OR UPDATE ON public.quiz_answers
-FOR EACH ROW EXECUTE FUNCTION public.log_quiz_answer_change();
+DO $block$
+DECLARE submission_table regclass;
+BEGIN
+    submission_table := COALESCE(pg_catalog.to_regclass('public.quiz_submissions'), pg_catalog.to_regclass('public.quiz_answers'));
+    IF submission_table IS NULL THEN
+        RAISE EXCEPTION 'Configure student submission storage before applying audit hardening';
+    END IF;
+    EXECUTE pg_catalog.format('DROP TRIGGER IF EXISTS trg_quiz_answer_audit ON %s', submission_table);
+    EXECUTE pg_catalog.format('CREATE TRIGGER trg_quiz_answer_audit AFTER INSERT OR UPDATE ON %s FOR EACH ROW EXECUTE FUNCTION public.log_quiz_answer_change()', submission_table);
+END;
+$block$;
 
 CREATE OR REPLACE FUNCTION public.reject_quiz_audit_mutation()
 RETURNS trigger
