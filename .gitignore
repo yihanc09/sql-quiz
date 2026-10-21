@@ -23,3 +23,6 @@ venv/
 # Generated local vector storage (rebuild from knowledge/documents.jsonl)
 .chroma/
 chroma_data/
+
+# Private workstation-only exports and backups
+.local/

@@ -1,3 +1,0 @@
-# Local MiniLM/Chroma development: use instead of requirements.txt.
--r requirements-core.txt
-chromadb==1.5.9

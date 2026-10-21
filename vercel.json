@@ -3,7 +3,7 @@
   "functions": {
     "web_server.py": {
       "maxDuration": 60,
-      "excludeFiles": "{tests/**,scripts/**,docs/**,.env,.env.*,sql/**,.Rhistory,.cache/**,.chroma/**,.venv/**,.pytest_cache/**,__pycache__/**,**/__pycache__/**}"
+      "excludeFiles": "{tests/**,scripts/**,docs/**,.env,.env.*,.local/**,.vscode/**,sql/**,.Rhistory,.cache/**,.chroma/**,.venv/**,.venv-cloud/**,.pytest_cache/**,__pycache__/**,**/__pycache__/**}"
     }
   }
 }
