@@ -4,7 +4,7 @@
 
 The 17 curated knowledge documents have been embedded with OpenAI `text-embedding-3-small` (1536 dimensions) and indexed in Chroma Cloud. Both vector retrieval and the cloud retrieval → OpenAI SQL-generation flow passed real requests on October 21, 2026 using the HTTP-only Chroma client in a clean environment, without ONNX or local model weights.
 
-See [real cloud retrieval](examples/chroma_cloud_retrieval.json) and [real cloud RAG generation](examples/chroma_cloud_generation.json). These are CLI verification records, not public-deployment screenshots. The public Vercel application now uses this cloud path; see [authenticated production verification and screenshots](DEPLOYMENT_VERIFICATION.md).
+See [real cloud retrieval](../evidence/examples/chroma_cloud_retrieval.json) and [real cloud RAG generation](../evidence/examples/chroma_cloud_generation.json). These are CLI verification records, not public-deployment screenshots. The public Vercel application now uses this cloud path; see [authenticated production verification and screenshots](../evidence/deployment-verification.md).
 
 ## Backend configuration
 
@@ -30,16 +30,16 @@ For a clean cloud-only environment:
 ```bash
 python3.12 -m venv .venv-cloud
 .venv-cloud/bin/python -m pip install -r requirements.txt
-.venv-cloud/bin/python -m scripts.index_knowledge --cloud
-.venv-cloud/bin/python -m scripts.check_cloud
-.venv-cloud/bin/python -m scripts.search_knowledge --cloud "What is the average track duration in minutes for each genre?"
-.venv-cloud/bin/python -m scripts.generate_sql --cloud "How many artists are there?"
+.venv-cloud/bin/python -m scripts.rag.index_knowledge --cloud
+.venv-cloud/bin/python -m scripts.rag.check_cloud
+.venv-cloud/bin/python -m scripts.rag.search_knowledge --cloud "What is the average track duration in minutes for each genre?"
+.venv-cloud/bin/python -m scripts.rag.generate_sql --cloud "How many artists are there?"
 .venv-cloud/bin/python web_server.py --port 8001
 ```
 
 The existing full local `.venv` can run these cloud commands too. Indexing sends the 17 curated knowledge documents to OpenAI for embedding, then uploads documents, vectors and metadata to Chroma Cloud. It does not upload business rows, quiz answers, student submissions or audit logs. Reindexing upserts stable IDs and removes stale IDs only within this application-managed collection. The status command does not call either OpenAI API.
 
-Do not install `chromadb` and `chromadb-client` together: they provide the same import namespace. `requirements.txt` uses the HTTP-only distribution; `requirements-rag.txt` uses full local Chroma instead. Both share `requirements-core.txt`. The existing full local environment remains usable; use a separate clean environment for cloud-only installation.
+Do not install `chromadb` and `chromadb-client` together: they provide the same import namespace. `requirements.txt` uses the HTTP-only distribution; `requirements/local.txt` uses full local Chroma instead. Both share `requirements/base.txt`. The existing full local environment remains usable; use a separate clean environment for cloud-only installation.
 
 ## Model consistency
 

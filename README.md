@@ -24,15 +24,15 @@ Chroma stores 17 curated documents: eleven table schemas, four business/SQL rule
 
 Sign in, open a question, and choose **Knowledge → Generate SQL**. Review the generated code and its sources. **Use in editor** replaces the current draft; **Run query** executes it through the existing restricted reader. **Submit answer** compares the result with the selected quiz question. Generation does not automatically run, save, or grade SQL; this project does not claim the automatic execution/validation extra credit.
 
-The public workflow was verified on October 21, 2026: the artist-count question generated `SELECT COUNT(*) AS total_artists FROM public.artist;`, and a manual run returned `275`. See [deployment verification and CI evidence](docs/DEPLOYMENT_VERIFICATION.md).
+The public workflow was verified on October 21, 2026: the artist-count question generated `SELECT COUNT(*) AS total_artists FROM public.artist;`, and a manual run returned `275`. See [deployment verification and CI evidence](docs/evidence/deployment-verification.md).
 
 ## Required RAG screenshot
 
 Actual signed-in production question and generated SQL:
 
-![Natural-language question and AI-generated SQL on the deployed website](docs/screenshots/week8-production-generated-sql.png)
+![Natural-language question and AI-generated SQL on the deployed website](docs/evidence/screenshots/week8-production-generated-sql.png)
 
-[Additional production screenshot: executed SQL, 275 artists, and Chroma Cloud retrieval metadata](docs/screenshots/week8-production-cloud-result.png). This shows a manual execution check, not an automatic-validation feature.
+[Additional production screenshot: executed SQL, 275 artists, and Chroma Cloud retrieval metadata](docs/evidence/screenshots/week8-production-cloud-result.png). This shows a manual execution check, not an automatic-validation feature.
 
 ## Run locally
 
@@ -46,9 +46,9 @@ python web_server.py --port 8001
 
 Open [localhost:8001](http://localhost:8001), sign in, select a question, and write SQL with the `public.` schema prefix. **Run query** shows the result. **Hint → Reference SQL & expected result → Load live reference** executes the instructor query. **Submit answer** compares the current result tables and saves the score.
 
-The existing project uses `DATABASE_URL` and `DATABASE_PASSWORD` in `.env`. Its Supabase application and reader settings are stored in the backend-only `quiz_private.runtime_config` table. A fresh project also needs Auth, answer-table policies, and a restricted reader; see [setup and operations](docs/OPERATIONS.md).
+The existing project uses `DATABASE_URL` and `DATABASE_PASSWORD` in `.env`. Its Supabase application and reader settings are stored in the backend-only `quiz_private.runtime_config` table. A fresh project also needs Auth, answer-table policies, and a restricted reader; see [setup and operations](docs/guides/setup-and-operations.md).
 
-For cloud-backed RAG, also fill the OpenAI/Chroma fields in `.env.example` using your own backend credentials and set `CHROMA_MODE=cloud`. Build your cloud collection once with `python -m scripts.index_knowledge --cloud`, then restart the server. See [cloud setup](docs/CHROMA_CLOUD.md) for all eight settings and [local Chroma setup](docs/CHROMA_LOCAL.md) if using local MiniLM instead. Never install the full and HTTP-only Chroma distributions together.
+For cloud-backed RAG, also fill the OpenAI/Chroma fields in `.env.example` using your own backend credentials and set `CHROMA_MODE=cloud`. Build your cloud collection once with `python -m scripts.rag.index_knowledge --cloud`, then restart the server. See [cloud setup](docs/guides/chroma-cloud.md) for all eight settings and [local Chroma setup](docs/guides/chroma-local.md) if using local MiniLM instead. Never install the full and HTTP-only Chroma distributions together.
 
 Optional Streamlit interface:
 
@@ -60,31 +60,31 @@ python -m streamlit run app.py
 
 ```text
 IDS706-SQL-Quiz/
-├── app.py                  # Thin Streamlit launcher
-├── web_server.py           # Thin local/Vercel launcher
-├── sql_quiz/               # Application code: auth, SQL execution, quiz, grading, APIs
-├── frontend/               # HTML, CSS and browser JavaScript
-├── scripts/                # Database administration and data/knowledge commands
-├── data/
-│   ├── chinook/            # 11 business-data CSVs (15,607 rows)
-│   └── schema.json         # Column types, keys, relationships and expected counts
-├── knowledge/              # Curated documents; local vector index is ignored .chroma/
-├── sql/                    # Versioned database migrations
-├── tests/
-│   ├── unit/               # Offline tests
-│   ├── integration/        # Live Supabase and database security tests
-│   ├── vector/             # Native Chroma tests without model downloads
-│   └── fixtures/           # Offline reference-result snapshot
-├── docs/                   # Structure, setup, live-table linking and RAG preparation
-├── .github/workflows/      # CI, including database tests using GitHub Secrets
-├── .env.example            # Configuration template; real .env stays untracked
-├── pyproject.toml          # Runtime dependencies, Vercel entrypoint, pytest configuration
-├── requirements.txt        # Runtime plus local Streamlit/test dependencies
-├── requirements-rag.txt    # Optional Chroma development environment
-└── vercel.json             # Function configuration and bundle exclusions
+├── app.py, web_server.py   # Stable Streamlit and HTTP launchers
+├── sql_quiz/              # Auth, database, quiz, grading and RAG services
+├── frontend/              # Browser HTML/CSS/JavaScript
+├── scripts/
+│   ├── admin/             # Database, permissions and audit administration
+│   ├── data/              # CSV preparation, corpus generation and fixtures
+│   └── rag/               # Indexing, retrieval and generation commands
+├── requirements/          # Shared and optional local dependencies
+├── data/                  # Eleven CSV tables and the schema contract
+├── knowledge/             # Curated retrieval corpus; vectors stored separately
+├── sql/                   # Numbered database migrations
+├── tests/                 # Unit, integration, vector tests and fixtures
+├── docs/
+│   ├── guides/            # Setup and operation instructions
+│   ├── reference/         # Project structure and database design
+│   ├── evidence/          # Deployment records, screenshots and API examples
+│   └── archive/           # Historical preparation notes
+├── .github/workflows/     # CI with GitHub Secrets
+├── .env.example           # Public configuration template
+├── pyproject.toml         # Production runtime, Vercel entrypoint and pytest
+├── requirements.txt       # Cloud/web development and CI environment
+└── vercel.json            # Function settings and private-file exclusions
 ```
 
-See [the file-by-file guide](docs/STRUCTURE.md) for where to make changes.
+See [the file-by-file guide](docs/reference/project-structure.md) for where to make changes.
 
 ## Quiz and database
 
@@ -110,21 +110,21 @@ Student queries use read-only transactions, prepared statements, a 10-second tim
 ```bash
 python -m pytest                                  # Offline unit tests
 python -m pytest tests/integration -v              # Requires Supabase connectivity
-python -m scripts.prepare_data                    # Offline CSV integrity checks
-python -m scripts.prepare_data --check-db         # Full-row live data comparison
-python -m scripts.build_knowledge                  # Rebuild retrieval documents
+python -m scripts.data.prepare_data                    # Offline CSV integrity checks
+python -m scripts.data.prepare_data --check-db         # Full-row live data comparison
+python -m scripts.data.build_knowledge                  # Rebuild retrieval documents
 ```
 
 Maintenance commands and their database effects are documented in [scripts/README.md](scripts/README.md). The Actions workflow runs unit and integration tests separately; the integration job reads the `QUIZ_DATABASE_URL` GitHub Secret. Never commit passwords, API keys or `.env` files.
 
 ## Documentation
 
-- [File structure and editing guide](docs/STRUCTURE.md)
-- [Local setup, deployment, configuration and audit operations](docs/OPERATIONS.md)
-- [Connecting the uploaded tables to live hints and grading](docs/LIVE_TABLE_LINKING.md)
-- [Local ChromaDB setup and real vector retrieval](docs/CHROMA_LOCAL.md)
-- [Chroma Cloud setup](docs/CHROMA_CLOUD.md)
-- [OpenAI generation setup](docs/AI_SQL_GENERATION.md)
-- [Week 8 RAG preparation and implementation status](docs/WEEK8_PREPARATION.md)
+- [File structure and editing guide](docs/reference/project-structure.md)
+- [Local setup, deployment, configuration and audit operations](docs/guides/setup-and-operations.md)
+- [Connecting the uploaded tables to live hints and grading](docs/reference/live-database.md)
+- [Local ChromaDB setup and real vector retrieval](docs/guides/chroma-local.md)
+- [Chroma Cloud setup](docs/guides/chroma-cloud.md)
+- [OpenAI generation setup](docs/guides/sql-generation.md)
+- [Week 8 RAG preparation and implementation status](docs/archive/week8-preparation.md)
 
-- [Production Week 8 and original Week 7 screenshots](docs/SCREENSHOTS.md)
+- [Production Week 8 and original Week 7 screenshots](docs/evidence/screenshots.md)

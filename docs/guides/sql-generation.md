@@ -4,13 +4,13 @@
 
 The local web application performs the full question → Chroma vector retrieval → OpenAI → generated SQL flow. OpenAI was selected for this project. The backend calls the Responses API with `gpt-4.1-mini` by default; `OPENAI_MODEL` can select another model available to the account.
 
-A real local call on October 21, 2026 retrieved five knowledge documents and generated `SELECT COUNT(*) AS total_artists FROM public.artist;`. The [captured response](examples/openai_generation.json) includes the generated SQL and actual retrieval evidence. It is a CLI smoke check, not a screenshot or a public deployment check.
+A real local call on October 21, 2026 retrieved five knowledge documents and generated `SELECT COUNT(*) AS total_artists FROM public.artist;`. The [captured response](../evidence/examples/openai_generation.json) includes the generated SQL and actual retrieval evidence. It is a CLI smoke check, not a screenshot or a public deployment check.
 
-Cloud retrieval has subsequently been implemented and verified; see [Chroma Cloud](CHROMA_CLOUD.md). The full public flow and required screenshot are now verified; see [production verification](DEPLOYMENT_VERIFICATION.md).
+Cloud retrieval has subsequently been implemented and verified; see [Chroma Cloud](chroma-cloud.md). The full public flow and required screenshot are now verified; see [production verification](../evidence/deployment-verification.md).
 
 ## Configure and run
 
-1. Follow [local Chroma setup](CHROMA_LOCAL.md) to install `requirements-rag.txt` and build the persistent index.
+1. Follow [local Chroma setup](chroma-local.md) to install `requirements/local.txt` and build the persistent index.
 2. Add these backend settings to the ignored root `.env`:
 
    ```dotenv
@@ -21,7 +21,7 @@ Cloud retrieval has subsequently been implemented and verified; see [Chroma Clou
 3. Check configuration without spending API tokens:
 
    ```bash
-   .venv/bin/python -m scripts.generate_sql --check-config
+   .venv/bin/python -m scripts.rag.generate_sql --check-config
    ```
 
 4. Start or restart the local server:
@@ -38,7 +38,7 @@ A server restart clears local login sessions; sign in again with your existing a
 CLI alternative (one model call per command):
 
 ```bash
-.venv/bin/python -m scripts.generate_sql "How many artists are in the Chinook database? Return one column named total_artists."
+.venv/bin/python -m scripts.rag.generate_sql "How many artists are in the Chinook database? Return one column named total_artists."
 ```
 
 ## Architecture

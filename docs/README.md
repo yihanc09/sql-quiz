@@ -1,15 +1,32 @@
 # Documentation
 
-| Document | Purpose |
-|---|---|
-| [STRUCTURE.md](STRUCTURE.md) | Directory responsibilities and where to make changes |
-| [OPERATIONS.md](OPERATIONS.md) | Installation, configuration, local launch, deployment, CI and audit operations |
-| [LIVE_TABLE_LINKING.md](LIVE_TABLE_LINKING.md) | How the 11 uploaded public tables power questions, live hints and grading |
-| [CHROMA_LOCAL.md](CHROMA_LOCAL.md) | Local embeddings, persistent Chroma, retrieval UI and remaining cloud steps |
-| [CHROMA_CLOUD.md](CHROMA_CLOUD.md) | Cloud credentials, indexing, deployment dependencies and real remote retrieval checks |
-| [AI_SQL_GENERATION.md](AI_SQL_GENERATION.md) | OpenAI configuration, generated SQL workflow, API boundaries and verification |
-| [WEEK8_PREPARATION.md](WEEK8_PREPARATION.md) | Completed RAG preparation and remaining implementation requirements |
-| [DEPLOYMENT_VERIFICATION.md](DEPLOYMENT_VERIFICATION.md) | Repository commits, successful CI/build evidence and remaining public checks |
-| [SCREENSHOTS.md](SCREENSHOTS.md) | Preserved screenshots from the original Week 7 project |
+Start with the [project overview and live application](../README.md). Choose a document by the task you need to complete.
 
-Start with the [project README](../README.md). See [maintenance commands](../scripts/README.md) for database/data tooling.
+## Guides: run and operate the application
+
+| Guide | Use it for |
+|---|---|
+| [Setup and operations](guides/setup-and-operations.md) | Supabase setup, local launch, deployment, authentication and audit operations |
+| [Chroma Cloud](guides/chroma-cloud.md) | Production vector storage, remote embeddings, indexing and connection checks |
+| [SQL generation](guides/sql-generation.md) | OpenAI configuration, prompts, generated SQL and execution boundaries |
+| [Local Chroma](guides/chroma-local.md) | Optional MiniLM embeddings and persistent development index |
+
+## Reference: understand the system
+
+| Reference | Contents |
+|---|---|
+| [Project structure](reference/project-structure.md) | Directory ownership, application modules, dependencies and editing conventions |
+| [Live database](reference/live-database.md) | Eleven uploaded tables, quiz references, reader permissions and submission storage |
+| [Maintenance commands](../scripts/README.md) | Commands grouped by administration, data preparation and RAG |
+
+## Evidence: review what was verified
+
+| Evidence | Contents |
+|---|---|
+| [Deployment verification](evidence/deployment-verification.md) | Repository commits, passing CI/builds and authenticated production checks |
+| [Screenshots](evidence/screenshots.md) | Real production SQL generation, cloud retrieval and result table |
+| [Captured API examples](evidence/examples/) | Real local/cloud retrieval and generation JSON responses |
+
+## Archive: implementation history
+
+[Week 8 preparation](archive/week8-preparation.md) preserves the implementation handoff and initial data checks. Use the guides above for current commands and deployment instructions.

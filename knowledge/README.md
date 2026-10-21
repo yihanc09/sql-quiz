@@ -1,22 +1,13 @@
-# Retrieval knowledge sources
+# Retrieval knowledge corpus
 
-`documents.jsonl` is the curated source corpus. Its embeddings are stored separately in the local Chroma database under ignored `.chroma/`.
-
-Rebuild from the full schema contract and curated semantics/examples:
+`documents.jsonl` contains 17 curated documents: eleven table schemas, four business/SQL rules and two independent examples. Each record has a stable ID, retrieval text and flat source metadata. Instructor answers, student work, audit records and credentials are excluded.
 
 ```bash
-python -m scripts.build_knowledge
+python -m scripts.data.build_knowledge
+python -m scripts.rag.index_knowledge --cloud
+python -m scripts.rag.search_knowledge --cloud "Which tables connect customers to purchases?"
 ```
 
-Each JSONL record contains `id`, `text`, and flat `metadata` fields, used by the Chroma ingestion command. Index `text`, preserve IDs and metadata, and use vector similarity retrieval for each user question. There are no answer tables, user records, credentials, or complete quiz answers in this corpus. The few-shot queries are separate examples.
+The source corpus is committed; vectors live in Chroma Cloud or an ignored local `.chroma/` directory. Rebuild and explicitly reindex after changing the corpus. Existing provenance refers to the stable `scripts/build_knowledge.py` entry point, which delegates to `scripts/data/build_knowledge.py`.
 
-See [the preparation handoff](../docs/WEEK8_PREPARATION.md) for checks, architecture, hosting constraints, and remaining work.
-
-Build and search the actual vector index after installing `requirements-rag.txt`:
-
-```bash
-.venv/bin/python -m scripts.index_knowledge
-.venv/bin/python -m scripts.search_knowledge "Which artists have the largest album catalogs?"
-```
-
-See [local Chroma retrieval](../docs/CHROMA_LOCAL.md) for the model, persistence, validation and deployment boundaries.
+See [cloud retrieval](../docs/guides/chroma-cloud.md), [optional local retrieval](../docs/guides/chroma-local.md) and [AI generation](../docs/guides/sql-generation.md).

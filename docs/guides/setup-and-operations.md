@@ -10,7 +10,7 @@ python -m pip install -r requirements.txt
 
 The independent frontend requires no Node.js build step. `requirements.txt` includes Streamlit and pytest for local development; `pyproject.toml` contains the backend runtime dependencies used by Vercel.
 
-Create `.env` using [the example](../.env.example):
+Create `.env` using [the example](../../.env.example):
 
 ```dotenv
 DATABASE_URL=postgresql://postgres.YOUR_PROJECT_REF@YOUR_POOLER_HOST:5432/postgres?sslmode=require
@@ -24,14 +24,14 @@ The existing project stores `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `QUIZ_DATABASE_
 For first-time private-settings initialization in an already configured project:
 
 ```bash
-python -m scripts.configure_runtime --init
-python -m scripts.configure_runtime --check
+python -m scripts.admin.configure_runtime --init
+python -m scripts.admin.configure_runtime --check
 ```
 
-Initialization applies [002_runtime_configuration.sql](../sql/002_runtime_configuration.sql), preserves existing settings, and generates a session encryption key if needed. If initial Auth/reader settings are only in the ignored local backup:
+Initialization applies [002_runtime_configuration.sql](../../sql/002_runtime_configuration.sql), preserves existing settings, and generates a session encryption key if needed. If initial Auth/reader settings are only in the ignored local backup:
 
 ```bash
-python -m scripts.configure_runtime --init --from-env .env.old
+python -m scripts.admin.configure_runtime --init --from-env .local/backups/.env.old
 ```
 
 The backup is read without replacing the current administrator connection or printing credentials. A fresh project still needs its own Auth setup, per-user answer policies, and reader credentials; this command does not create a complete application database.
@@ -63,8 +63,8 @@ The application stores new student drafts and grades in `public.quiz_submissions
 For this project's existing Auth/audit setup:
 
 ```bash
-python -m scripts.configure_submissions --apply
-python -m scripts.configure_submissions --check
+python -m scripts.admin.configure_submissions --apply
+python -m scripts.admin.configure_submissions --check
 ```
 
 The first command applies `sql/003_submission_storage.sql`; the second checks permissions without writes. Authentication is independent of loading submission records: unavailable progress storage produces a warning, while a valid user can still log in and run SQL. Saving/grading persistence can fail separately until storage is repaired.
@@ -74,20 +74,20 @@ The first command applies `sql/003_submission_storage.sql`; the second checks pe
 All 11 uploaded business tables are in `public`. `data/chinook/` contains the CSVs and `data/schema.json` defines types, keys, nullability and expected row counts.
 
 ```bash
-python -m scripts.prepare_data
-python -m scripts.prepare_data --check-db
-python -m scripts.link_public_tables
+python -m scripts.data.prepare_data
+python -m scripts.data.prepare_data --check-db
+python -m scripts.admin.link_public_tables
 ```
 
-The first command is offline; the latter two are read-only database checks. For type/key/reader configuration on the existing uploaded tables, use `python -m scripts.link_public_tables --apply`. For absent tables on a new data-only schema, `python -m scripts.prepare_data --apply` creates tables and fills empty ones, rejecting existing nonempty mismatches. These write commands preserve existing records and roll back on failure; they do not provision a fresh Auth application.
+The first command is offline; the latter two are read-only database checks. For type/key/reader configuration on the existing uploaded tables, use `python -m scripts.admin.link_public_tables --apply`. For absent tables on a new data-only schema, `python -m scripts.data.prepare_data --apply` creates tables and fills empty ones, rejecting existing nonempty mismatches. These write commands preserve existing records and roll back on failure; they do not provision a fresh Auth application.
 
-[quiz.py](../sql_quiz/quiz.py) defines the questions and reference SQL. Hints and grading fetch live results through [quiz_reference.py](../sql_quiz/quiz_reference.py). `tests/fixtures/expected_results.json` is an offline test snapshot and is not a runtime fallback. Export a new snapshot after intentional dataset/question changes:
+[quiz.py](../../sql_quiz/quiz.py) defines the questions and reference SQL. Hints and grading fetch live results through [quiz_reference.py](../../sql_quiz/quiz_reference.py). `tests/fixtures/expected_results.json` is an offline test snapshot and is not a runtime fallback. Export a new snapshot after intentional dataset/question changes:
 
 ```bash
-python -m scripts.generate_expected_results
+python -m scripts.data.generate_expected_results
 ```
 
-See [live-table linking](LIVE_TABLE_LINKING.md) for details and concurrency limitations.
+See [live-table linking](../reference/live-database.md) for details and concurrency limitations.
 
 ## Deploy to Vercel
 
@@ -120,7 +120,7 @@ python -m pytest tests/unit tests/integration -v  # Both suites
 
 Pytest configuration is in `pyproject.toml`; caches go in ignored `.cache/pytest/`. Integration tests require the configured reader connection, either from private settings or a `QUIZ_DATABASE_URL` environment override.
 
-[GitHub Actions](../.github/workflows/test.yml) has two separate jobs. The unit job runs `tests/unit`; the database job runs `tests/integration` and reads `QUIZ_DATABASE_URL` from GitHub Secrets. Administrator credentials are not required in CI. Repository Secrets are scoped independently: configure the restricted `QUIZ_DATABASE_URL` in both repositories when running both live integration workflows. The deployment repository has this reader-only Secret configured as well. Check the actual workflow run before reporting GitHub status.
+[GitHub Actions](../../.github/workflows/test.yml) has two separate jobs. The unit job runs `tests/unit`; the database job runs `tests/integration` and reads `QUIZ_DATABASE_URL` from GitHub Secrets. Administrator credentials are not required in CI. Repository Secrets are scoped independently: configure the restricted `QUIZ_DATABASE_URL` in both repositories when running both live integration workflows. The deployment repository has this reader-only Secret configured as well. Check the actual workflow run before reporting GitHub status.
 
 ## SQL execution and audit integrity
 
@@ -142,34 +142,34 @@ Direct audit-table privileges are revoked from `quiz_reader`, `authenticated`, `
 Maintenance commands:
 
 ```bash
-python -m scripts.audit_admin --apply
-python -m scripts.audit_admin --check
-python -m scripts.audit_admin --recent 20
+python -m scripts.admin.audit_admin --apply
+python -m scripts.admin.audit_admin --check
+python -m scripts.admin.audit_admin --recent 20
 ```
 
-`--apply` runs [001_audit_hardening.sql](../sql/001_audit_hardening.sql). `--check` verifies permissions, role flags, ownership, RLS, triggers and function execution rights. It probes UPDATE, DELETE and TRUNCATE using the real reader and role-switched authenticated/anon connections, forcing all probes to roll back; only SQLSTATE 42501 counts as a permission denial. `--recent` accepts 1–100 and prints audit records including SQL. No student-facing audit-reading endpoint is exposed.
+`--apply` runs [001_audit_hardening.sql](../../sql/001_audit_hardening.sql). `--check` verifies permissions, role flags, ownership, RLS, triggers and function execution rights. It probes UPDATE, DELETE and TRUNCATE using the real reader and role-switched authenticated/anon connections, forcing all probes to roll back; only SQLSTATE 42501 counts as a permission denial. `--recent` accepts 1–100 and prints audit records including SQL. No student-facing audit-reading endpoint is exposed.
 
 Keep backend credentials and submitted SQL secrets private. Administrators can change permissions and disable triggers; append-only protections address student-role edits and are not cryptographic tamper proofing. Public deployments also need appropriate operational monitoring and rate limiting.
 
 ## RAG preparation
 
 ```bash
-python -m scripts.build_knowledge
+python -m scripts.data.build_knowledge
 ```
 
 This rebuilds `knowledge/documents.jsonl` from schema metadata and curated business rules/examples. To create and query the actual local vector index, install the optional Python 3.12 environment and run:
 
 ```bash
-.venv/bin/python -m scripts.index_knowledge
-.venv/bin/python -m scripts.search_knowledge "What is the average track duration for each genre?"
+.venv/bin/python -m scripts.rag.index_knowledge
+.venv/bin/python -m scripts.rag.search_knowledge "What is the average track duration for each genre?"
 .venv/bin/python web_server.py --port 8001
 ```
 
-See [local Chroma setup](CHROMA_LOCAL.md) for installation and the retrieval inspector. Local retrieval and authenticated OpenAI generation are implemented; see [AI generation setup](AI_SQL_GENERATION.md). Chroma Cloud retrieval is now verified; see [cloud configuration](CHROMA_CLOUD.md). The public RAG flow is also verified; see [deployment evidence](DEPLOYMENT_VERIFICATION.md). See [Week 8 preparation](WEEK8_PREPARATION.md) for remaining requirements.
+See [local Chroma setup](chroma-local.md) for installation and the retrieval inspector. Local retrieval and authenticated OpenAI generation are implemented; see [AI generation setup](sql-generation.md). Chroma Cloud retrieval is now verified; see [cloud configuration](chroma-cloud.md). The public RAG flow is also verified; see [deployment evidence](../evidence/deployment-verification.md). See [Week 8 preparation](../archive/week8-preparation.md) for remaining requirements.
 
 
 ## Import the RAG deployment environment
 
-In the existing Vercel project's **Environment Variables → Add new** form, choose **Import .env** and select the local ignored `.env.vercel` file. The import creates eight separate rows. **Key** is the variable name; **Value** is that variable's corresponding value, not the entire file. Use Secret for API credentials (storing all eight imported rows as Secret is also supported) and select Production. Save, then redeploy so the new function process receives these settings. Existing database/session variables should be retained.
+In the existing Vercel project's **Environment Variables → Add new** form, choose **Import .env** and select the local ignored `.local/deployment.env` file. The import creates eight separate rows. **Key** is the variable name; **Value** is that variable's corresponding value, not the entire file. Use Secret for API credentials (storing all eight imported rows as Secret is also supported) and select Production. Save, then redeploy so the new function process receives these settings. Existing database/session variables should be retained.
 
-The import file is generated locally for this project and is not a repository artifact. The public placeholder list is in `.env.example`. See [deployment verification](DEPLOYMENT_VERIFICATION.md) for actual CI/build and application checks.
+The import file is generated locally for this project and is not a repository artifact. The public placeholder list is in `.env.example`. See [deployment verification](../evidence/deployment-verification.md) for actual CI/build and application checks.

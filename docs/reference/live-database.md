@@ -26,7 +26,7 @@ Student drafts and grades now live in `public.quiz_submissions`, and audit event
 
 ## Supabase changes applied
 
-`python -m scripts.link_public_tables --apply` was run on October 21, 2026. In a transaction, it:
+`python -m scripts.admin.link_public_tables --apply` was run on October 21, 2026. In a transaction, it:
 
 1. Validated every uploaded row against all 11 local CSVs, including types and foreign-key integrity.
 2. Converted employee reporting IDs from text to integer; converted employee and invoice dates from text to timestamp; converted prices/totals from floating point to `numeric(10,2)`.
@@ -39,14 +39,14 @@ The existing `chinook` tables, user answers, audit log, Auth configuration, and 
 Read-only preflight and exact comparison:
 
 ```bash
-python -m scripts.link_public_tables
-python -m scripts.prepare_data --check-db
+python -m scripts.admin.link_public_tables
+python -m scripts.data.prepare_data --check-db
 ```
 
 To repeat the configuration on this same uploaded-table setup:
 
 ```bash
-python -m scripts.link_public_tables --apply
+python -m scripts.admin.link_public_tables --apply
 ```
 
 This script requires the existing configured administrator backend and `quiz_reader`, plus all 11 uploaded public tables. It is not a full new-project provisioner. Reapplication is idempotent for its own constraints and RLS policies. A row mismatch, unexpected primary key, lock conflict, type conversion failure, or constraint failure aborts the transaction.
@@ -76,7 +76,7 @@ The Actions workflow includes these checks. The canonical source and the connect
 
 ## RAG follow-up
 
-The prepared 17-document knowledge corpus now describes `public` tables. The five quiz answers and user submissions are not indexed. Local Chroma retrieval and OpenAI SQL generation are now implemented (see [AI generation](AI_SQL_GENERATION.md)); this live-table connection does not itself constitute RAG.
+The prepared 17-document knowledge corpus now describes `public` tables. The five quiz answers and user submissions are not indexed. Local Chroma retrieval and OpenAI SQL generation are now implemented (see [AI generation](../guides/sql-generation.md)); this live-table connection does not itself constitute RAG.
 
 ## Recovering after deleting legacy answer storage
 
@@ -85,8 +85,8 @@ Deleting the old `quiz_answers` table left Auth accounts intact but broke the pr
 The application now separates verified authentication from progress loading. A valid login returns a session even if progress retrieval fails; a storage warning is shown separately. SQL execution remains available. Both the web and Streamlit interfaces use the dedicated `quiz_submissions` table for new drafts and grades.
 
 ```bash
-python -m scripts.configure_submissions --apply
-python -m scripts.configure_submissions --check
+python -m scripts.admin.configure_submissions --apply
+python -m scripts.admin.configure_submissions --check
 ```
 
 The migration creates empty student storage, ownership RLS policies, required grants, timestamps, and the existing answer-change audit trigger. It does not restore deleted data, recreate the legacy table, seed solutions, or modify login accounts. Authenticated insert/update and cross-user isolation were verified in a forced-rollback transaction, with no test submissions retained.

@@ -1,12 +1,14 @@
 # Week 8 preparation and handoff
 
+Historical implementation record. For current setup, use [the guides](../README.md); for the verified public outcome, use [deployment evidence](../evidence/deployment-verification.md).
+
 ## Current status
 
-Local ChromaDB retrieval is now implemented and verified over the 17-document corpus using 384-dimensional MiniLM embeddings. See [CHROMA_LOCAL.md](CHROMA_LOCAL.md) for installation, indexing, the web inspector and a real retrieval example. OpenAI SQL generation is implemented and a real local request passed. See [AI_SQL_GENERATION.md](AI_SQL_GENERATION.md). Chroma Cloud indexing and cloud-backed RAG have also passed real CLI requests; see [CHROMA_CLOUD.md](CHROMA_CLOUD.md). The public RAG deployment and authenticated browser verification are also complete; see [DEPLOYMENT_VERIFICATION.md](DEPLOYMENT_VERIFICATION.md).
+Local ChromaDB retrieval is now implemented and verified over the 17-document corpus using 384-dimensional MiniLM embeddings. See [CHROMA_LOCAL.md](../guides/chroma-local.md) for installation, indexing, the web inspector and a real retrieval example. OpenAI SQL generation is implemented and a real local request passed. See [AI_SQL_GENERATION.md](../guides/sql-generation.md). Chroma Cloud indexing and cloud-backed RAG have also passed real CLI requests; see [CHROMA_CLOUD.md](../guides/chroma-cloud.md). The public RAG deployment and authenticated browser verification are also complete; see [DEPLOYMENT_VERIFICATION.md](../evidence/deployment-verification.md).
 
 ## What was verified
 
-**Update:** the user subsequently uploaded a new set of tables to `public`. These are now the active source. See [the live-table linking notes](LIVE_TABLE_LINKING.md); the older `chinook` copy remains intact.
+**Update:** the user subsequently uploaded a new set of tables to `public`. These are now the active source. See [the live-table linking notes](../reference/live-database.md); the older `chinook` copy remains intact.
 
 On October 21, 2026, read-only checks against the existing Supabase project confirmed:
 
@@ -15,7 +17,7 @@ On October 21, 2026, read-only checks against the existing Supabase project conf
 - Eight CSV city values had a trailing space (`Edinburgh `): customer 54 and invoices 20, 141, 152, 207, 336, 359, 381. Only these CSV values were cleaned to match the existing database. No hosted data was changed.
 - After cleaning, all 11 tables match the hosted database row-for-row, including types and NULLs. The restricted reader can query all 11 tables.
 - The five existing reference SQL queries execute through the restricted reader and match the saved result tables.
-- The first preparation validation passed 64 offline tests and 20 hosted database/security tests. The subsequent public-table linking has separate verification described in [LIVE_TABLE_LINKING.md](LIVE_TABLE_LINKING.md). The new bootstrap write path was not executed against the shared database.
+- The first preparation validation passed 64 offline tests and 20 hosted database/security tests. The subsequent public-table linking has separate verification described in [LIVE_TABLE_LINKING.md](../reference/live-database.md). The new bootstrap write path was not executed against the shared database.
 - Q3's grading now enforces its requested alphabetical order, instead of accepting arbitrary genre ordering.
 
 The original standard SQL and expected results are legitimate grading fixtures. They do not need to be deleted. Student submissions belong in `public.quiz_submissions`, separate from business data. The deleted legacy `quiz_answers` table is no longer used. Neither should be used as the source of truth for schema retrieval.
@@ -34,8 +36,8 @@ The original standard SQL and expected results are legitimate grading fixtures. 
 
 ```bash
 python -m pip install -r requirements.txt
-python -m scripts.prepare_data
-python -m scripts.build_knowledge
+python -m scripts.data.prepare_data
+python -m scripts.data.build_knowledge
 python -m pytest tests/unit/test_data_preparation.py tests/unit/test_grading.py -q
 ```
 
@@ -44,7 +46,7 @@ The default preparation command performs no network requests. It checks exact he
 To compare every typed CSV row against the current hosted database:
 
 ```bash
-python -m scripts.prepare_data --check-db
+python -m scripts.data.prepare_data --check-db
 ```
 
 This uses the existing backend `.env` configuration and a read-only, repeatable-read transaction. It prints counts and mismatch counts, without customer records or credentials. Counts alone do not prove dataset equality.
@@ -52,7 +54,7 @@ This uses the existing backend `.env` configuration and a read-only, repeatable-
 For a new empty database, an explicit bootstrap command is available:
 
 ```bash
-python -m scripts.prepare_data --apply
+python -m scripts.data.prepare_data --apply
 ```
 
 It creates missing Chinook tables with primary and foreign keys, and inserts data using bound parameters in dependency order. Existing nonempty tables must match the CSVs exactly; mismatches abort and roll back the entire transaction. It never drops, truncates, updates, or deletes existing rows. It does not provision Auth, quiz answer tables, runtime secrets, or reader credentials for a new project. The current project already has those components and does not need reimporting.
@@ -80,7 +82,7 @@ Authenticated natural-language question
 
 The corpus currently contains 17 documents: 11 table documents, four business/rules documents, and two examples different from the five quiz reference queries. Each has a stable ID and source metadata. Do not indiscriminately index the repository: runtime secrets, user answers, audit logs, and grading fixtures are excluded from this corpus.
 
-**Local and public cloud-backed RAG are implemented and verified.** The application embeds questions, queries Chroma, and calls the OpenAI Responses API through authenticated `/api/generate`. A real local generated response is recorded in `docs/examples/openai_generation.json`.
+**Local and public cloud-backed RAG are implemented and verified.** The application embeds questions, queries Chroma, and calls the OpenAI Responses API through authenticated `/api/generate`. A real local generated response is recorded in `docs/evidence/examples/openai_generation.json`.
 
 For the deployed Vercel application, prefer a remote Chroma service (cloud or a separately hosted persistent Chroma server). A local persistent Chroma directory is suitable for development or a persistent server host. Vercel's filesystem does not provide durable shared writes across function instances; writing an index there on every request is not a dependable deployment design. A remote service also avoids bundling local model weights into the current small Python deployment.
 
@@ -95,7 +97,7 @@ Expose retrieval evidence (source IDs or table names) beside generated SQL so th
 - The deployed question → retrieval → AI → SQL flow passed authenticated browser verification.
 - The README includes an actual production question/generated-SQL screenshot.
 - Manual execution of the generated count query returned 275. Automatic execution/validation extra credit is not implemented.
-- Submit the canonical GitHub repository URL from the README. CI/build and screenshot evidence are linked in [deployment verification](DEPLOYMENT_VERIFICATION.md).
+- Submit the canonical GitHub repository URL from the README. CI/build and screenshot evidence are linked in [deployment verification](../evidence/deployment-verification.md).
 
 ## Deployment references
 

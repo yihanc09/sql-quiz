@@ -20,7 +20,7 @@ Both GitHub Actions runs completed successfully. Each includes unit tests, nativ
 
 ## Environment activation and authenticated verification
 
-The eight new production settings are imported separately into Vercel, not as one combined variable. The local `.env.vercel` import file is ignored by Git and contains only the OpenAI/Chroma configuration; it excludes existing database settings. Saving changes requires a new deployment before they become available to running functions.
+The eight new production settings are imported separately into Vercel, not as one combined variable. The local `.local/deployment.env` import file is ignored by Git and contains only the OpenAI/Chroma configuration; it excludes existing database settings. Saving changes requires a new deployment before they become available to running functions.
 
 All eight new variables were confirmed in Vercel as Production Secrets, and [production redeployment 3afFQngT4bHGwwgxGauzATCt3QNd](https://vercel.com/yihan5/sql-quiz/3afFQngT4bHGwwgxGauzATCt3QNd) completed successfully with the saved settings. Authenticated public generation was then verified in the browser at `https://sql-quiz-jade.vercel.app/#question-1`:
 
@@ -32,4 +32,4 @@ All eight new variables were confirmed in Vercel as Production Secrets, and [pro
 
 [Question and generated SQL screenshot](screenshots/week8-production-generated-sql.png) · [Execution and cloud metadata screenshot](screenshots/week8-production-cloud-result.png).
 
-These production screenshots supplement the CLI JSON examples in `docs/examples/`. The application requires explicit Run/Submit actions and does not implement automatic execution/validation extra credit.
+These production screenshots supplement the CLI JSON examples in `docs/evidence/examples/`. The application requires explicit Run/Submit actions and does not implement automatic execution/validation extra credit.

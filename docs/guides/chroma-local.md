@@ -1,6 +1,6 @@
 # Local Chroma vector retrieval
 
-This stage implements actual embeddings, a persistent Chroma vector index and nearest-neighbor retrieval. The separate [OpenAI generation service](AI_SQL_GENERATION.md) now uses this retrieval output to produce SQL. The user chose local retrieval first; cloud integration is now available through the separate [Chroma Cloud path](CHROMA_CLOUD.md).
+This stage implements actual embeddings, a persistent Chroma vector index and nearest-neighbor retrieval. The separate [OpenAI generation service](sql-generation.md) now uses this retrieval output to produce SQL. The user chose local retrieval first; cloud integration is now available through the separate [Chroma Cloud path](chroma-cloud.md).
 
 ## Run
 
@@ -8,10 +8,10 @@ Use Python 3.12 for the tested local environment:
 
 ```bash
 python3.12 -m venv .venv
-.venv/bin/python -m pip install -r requirements-rag.txt
-.venv/bin/python -m scripts.build_knowledge
-.venv/bin/python -m scripts.index_knowledge
-.venv/bin/python -m scripts.search_knowledge "What is the average track duration in minutes for each genre?"
+.venv/bin/python -m pip install -r requirements/local.txt
+.venv/bin/python -m scripts.data.build_knowledge
+.venv/bin/python -m scripts.rag.index_knowledge
+.venv/bin/python -m scripts.rag.search_knowledge "What is the average track duration in minutes for each genre?"
 .venv/bin/python web_server.py --port 8001
 ```
 
@@ -43,16 +43,16 @@ Natural-language question
 
 The collection is `chinook_knowledge_minilm_v1`. SQLite/index files live in ignored `.chroma/`. The 17 inputs comprise 11 schema documents, four semantics/rules documents and two independent examples. Business rows remain in Supabase. Grading fixtures, student submissions, audit records and credentials are excluded from the retrieval corpus.
 
-A [real retrieval example](examples/chroma_retrieval.json) was produced with the CLI, including vector dimensions, corpus fingerprint, returned documents and measured distances. Distances are not answer confidence or correctness probabilities. Retrieval accuracy is not guaranteed.
+A [real retrieval example](../evidence/examples/chroma_retrieval.json) was produced with the CLI, including vector dimensions, corpus fingerprint, returned documents and measured distances. Distances are not answer confidence or correctness probabilities. Retrieval accuracy is not guaranteed.
 
 ## Implementation
 
 | File | Purpose |
 |---|---|
 | `sql_quiz/retrieval.py` | Lazy dependency loading, local Chroma client, explicit embeddings, indexing and querying |
-| `scripts/index_knowledge.py` | Build/update the persistent vector collection |
-| `scripts/search_knowledge.py` | Run real similarity search from the command line |
-| `requirements-rag.txt` | Optional local dependencies, including tested Chroma 1.5.9 |
+| `scripts/rag/index_knowledge.py` | Build/update the persistent vector collection |
+| `scripts/rag/search_knowledge.py` | Run real similarity search from the command line |
+| `requirements/local.txt` | Optional local dependencies, including tested Chroma 1.5.9 |
 | `tests/vector/` | Native Chroma persistence, vector ranking and update tests without model downloads |
 | `POST /api/retrieve` | Authenticated retrieval endpoint; no SQL execution or generation |
 
@@ -61,8 +61,8 @@ Indexing upserts stable document IDs and removes obsolete documents from this ge
 Rebuild after editing source schema or curated knowledge:
 
 ```bash
-.venv/bin/python -m scripts.build_knowledge
-.venv/bin/python -m scripts.index_knowledge
+.venv/bin/python -m scripts.data.build_knowledge
+.venv/bin/python -m scripts.rag.index_knowledge
 ```
 
 Optional environment settings, shown in `.env.example`:
@@ -86,10 +86,10 @@ Separately, all five quiz questions were embedded with the real MiniLM model and
 
 ## Next stages
 
-1. Verify the integrated [OpenAI generation workflow](AI_SQL_GENERATION.md) locally.
-2. Use the verified [Chroma Cloud path](CHROMA_CLOUD.md) for remote storage and deployment-compatible embeddings.
+1. Verify the integrated [OpenAI generation workflow](sql-generation.md) locally.
+2. Use the verified [Chroma Cloud path](chroma-cloud.md) for remote storage and deployment-compatible embeddings.
 3. Verify the full flow on the deployed site and capture the required question/generated-SQL screenshot.
 
-The public Vercel site uses the verified cloud path rather than this local storage backend; see [production verification](DEPLOYMENT_VERIFICATION.md). `VERCEL` deployments default to the cloud path and explicitly refuse local vector storage; the existing quiz can continue to function without the optional native dependencies. Both local generation and the public cloud-backed RAG flow are implemented and verified.
+The public Vercel site uses the verified cloud path rather than this local storage backend; see [production verification](../evidence/deployment-verification.md). `VERCEL` deployments default to the cloud path and explicitly refuse local vector storage; the existing quiz can continue to function without the optional native dependencies. Both local generation and the public cloud-backed RAG flow are implemented and verified.
 
 References: [Chroma clients](https://docs.trychroma.com/docs/run-chroma/clients), [embedding functions and the default MiniLM model](https://docs.trychroma.com/docs/embeddings/embedding-functions), [vector query API](https://docs.trychroma.com/docs/querying-collections/query-and-get), [cosine index configuration](https://docs.trychroma.com/docs/collections/configure).
