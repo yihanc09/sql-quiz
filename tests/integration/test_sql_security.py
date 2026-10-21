@@ -2,33 +2,33 @@
 
 import pytest
 
-from database import run_query
+from sql_quiz.database import run_query
 
 
 def test_select_query_allowed():
     """Normal SELECT queries should execute successfully."""
-    result = run_query("SELECT COUNT(*) AS total_artists FROM chinook.artist")
+    result = run_query("SELECT COUNT(*) AS total_artists FROM public.artist")
     assert result.iloc[0]["total_artists"] == 275
 
 
 def test_create_table_blocked():
     with pytest.raises(Exception):
-        run_query("CREATE TABLE chinook.test_security (id INTEGER)")
+        run_query("CREATE TABLE public.test_security (id INTEGER)")
 
 
 def test_delete_blocked():
     with pytest.raises(Exception):
-        run_query("DELETE FROM chinook.artist WHERE artist_id = 1")
+        run_query("DELETE FROM public.artist WHERE artist_id = 1")
 
 
 def test_update_blocked():
     with pytest.raises(Exception):
-        run_query("UPDATE chinook.artist SET name = 'Changed' WHERE artist_id = 1")
+        run_query("UPDATE public.artist SET name = 'Changed' WHERE artist_id = 1")
 
 
 def test_multiple_statements_blocked():
     with pytest.raises(Exception):
-        run_query("SELECT 1; DELETE FROM chinook.artist WHERE artist_id = 1")
+        run_query("SELECT 1; DELETE FROM public.artist WHERE artist_id = 1")
 
 
 def test_answer_table_not_readable():

@@ -5,7 +5,7 @@ import os
 import time
 
 from cryptography.fernet import Fernet, InvalidToken
-from runtime_config import get_setting
+from sql_quiz.runtime_config import get_setting
 
 SESSION_TTL = 12 * 60 * 60
 

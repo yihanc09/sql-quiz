@@ -1,11 +1,9 @@
 """Supabase authentication and per-user quiz answer persistence."""
-from dotenv import load_dotenv
+
 from supabase import create_client
 
-from database import get_connection
-from runtime_config import get_setting
-
-load_dotenv()
+from sql_quiz.database import get_connection
+from sql_quiz.runtime_config import get_setting
 
 
 def get_supabase_client():
@@ -17,7 +15,9 @@ def sign_up(email, password):
 
 
 def sign_in(email, password):
-    return get_supabase_client().auth.sign_in_with_password({"email": email, "password": password})
+    return get_supabase_client().auth.sign_in_with_password(
+        {"email": email, "password": password}
+    )
 
 
 def sign_out(client):
@@ -26,30 +26,38 @@ def sign_out(client):
 
 def save_answer(client, user_id, question_id, sql_answer):
     """Save a draft; clear any previous grade for that answer."""
-    return client.table("quiz_answers").upsert(
-        {
-            "user_id": user_id,
-            "question_id": question_id,
-            "sql_answer": sql_answer,
-            "score": None,
-            "is_correct": None,
-        },
-        on_conflict="user_id,question_id",
-    ).execute()
+    return (
+        client.table("quiz_answers")
+        .upsert(
+            {
+                "user_id": user_id,
+                "question_id": question_id,
+                "sql_answer": sql_answer,
+                "score": None,
+                "is_correct": None,
+            },
+            on_conflict="user_id,question_id",
+        )
+        .execute()
+    )
 
 
 def save_graded_answer(client, user_id, question_id, sql_answer, score, is_correct):
     """Persist SQL and its grade in the same upsert operation."""
-    return client.table("quiz_answers").upsert(
-        {
-            "user_id": user_id,
-            "question_id": question_id,
-            "sql_answer": sql_answer,
-            "score": score,
-            "is_correct": is_correct,
-        },
-        on_conflict="user_id,question_id",
-    ).execute()
+    return (
+        client.table("quiz_answers")
+        .upsert(
+            {
+                "user_id": user_id,
+                "question_id": question_id,
+                "sql_answer": sql_answer,
+                "score": score,
+                "is_correct": is_correct,
+            },
+            on_conflict="user_id,question_id",
+        )
+        .execute()
+    )
 
 
 def load_answer_records(client, user_id):

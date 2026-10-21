@@ -1,0 +1,465 @@
+{
+  "schema": "public",
+  "tables": [
+    {
+      "name": "artist",
+      "description": "Musicians and bands. One artist can have many albums.",
+      "row_count": 275,
+      "primary_key": [
+        "artist_id"
+      ],
+      "columns": [
+        {
+          "name": "artist_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": {}
+    },
+    {
+      "name": "album",
+      "description": "Albums belonging to artists. One album can contain many tracks.",
+      "row_count": 347,
+      "primary_key": [
+        "album_id"
+      ],
+      "columns": [
+        {
+          "name": "album_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "artist_id",
+          "type": "bigint",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": {
+        "artist_id": "artist.artist_id"
+      }
+    },
+    {
+      "name": "genre",
+      "description": "Music and video categories for tracks.",
+      "row_count": 25,
+      "primary_key": [
+        "genre_id"
+      ],
+      "columns": [
+        {
+          "name": "genre_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": {}
+    },
+    {
+      "name": "media_type",
+      "description": "Track file formats such as MPEG audio and video.",
+      "row_count": 5,
+      "primary_key": [
+        "media_type_id"
+      ],
+      "columns": [
+        {
+          "name": "media_type_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": {}
+    },
+    {
+      "name": "employee",
+      "description": "Store staff and reporting hierarchy; supports customers.",
+      "row_count": 8,
+      "primary_key": [
+        "employee_id"
+      ],
+      "columns": [
+        {
+          "name": "employee_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "reports_to",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "birth_date",
+          "type": "timestamp",
+          "nullable": true
+        },
+        {
+          "name": "hire_date",
+          "type": "timestamp",
+          "nullable": true
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "country",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "postal_code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "fax",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": {
+        "reports_to": "employee.employee_id"
+      }
+    },
+    {
+      "name": "customer",
+      "description": "Store customers, optionally assigned to a support employee.",
+      "row_count": 59,
+      "primary_key": [
+        "customer_id"
+      ],
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "company",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "country",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "postal_code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "fax",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "support_rep_id",
+          "type": "bigint",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": {
+        "support_rep_id": "employee.employee_id"
+      }
+    },
+    {
+      "name": "invoice",
+      "description": "Purchase headers; total is the full invoice amount.",
+      "row_count": 412,
+      "primary_key": [
+        "invoice_id"
+      ],
+      "columns": [
+        {
+          "name": "invoice_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "customer_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "invoice_date",
+          "type": "timestamp",
+          "nullable": false
+        },
+        {
+          "name": "billing_address",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "billing_city",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "billing_state",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "billing_country",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "billing_postal_code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "total",
+          "type": "numeric(10,2)",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": {
+        "customer_id": "customer.customer_id"
+      }
+    },
+    {
+      "name": "track",
+      "description": "Catalog tracks; duration is in milliseconds, price is per track. Includes video content.",
+      "row_count": 3503,
+      "primary_key": [
+        "track_id"
+      ],
+      "columns": [
+        {
+          "name": "track_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "album_id",
+          "type": "bigint",
+          "nullable": true
+        },
+        {
+          "name": "media_type_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "genre_id",
+          "type": "bigint",
+          "nullable": true
+        },
+        {
+          "name": "composer",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "milliseconds",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "bytes",
+          "type": "bigint",
+          "nullable": true
+        },
+        {
+          "name": "unit_price",
+          "type": "numeric(10,2)",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": {
+        "album_id": "album.album_id",
+        "media_type_id": "media_type.media_type_id",
+        "genre_id": "genre.genre_id"
+      }
+    },
+    {
+      "name": "invoice_line",
+      "description": "Purchased track line items; quantity is the number of units sold.",
+      "row_count": 2240,
+      "primary_key": [
+        "invoice_line_id"
+      ],
+      "columns": [
+        {
+          "name": "invoice_line_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "invoice_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "track_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "unit_price",
+          "type": "numeric(10,2)",
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "bigint",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": {
+        "invoice_id": "invoice.invoice_id",
+        "track_id": "track.track_id"
+      }
+    },
+    {
+      "name": "playlist",
+      "description": "Named playlists; membership does not represent purchases.",
+      "row_count": 18,
+      "primary_key": [
+        "playlist_id"
+      ],
+      "columns": [
+        {
+          "name": "playlist_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": {}
+    },
+    {
+      "name": "playlist_track",
+      "description": "Many-to-many playlist membership; a track may appear in multiple playlists.",
+      "row_count": 8715,
+      "primary_key": [
+        "playlist_id",
+        "track_id"
+      ],
+      "columns": [
+        {
+          "name": "playlist_id",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "track_id",
+          "type": "bigint",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": {
+        "playlist_id": "playlist.playlist_id",
+        "track_id": "track.track_id"
+      }
+    }
+  ]
+}

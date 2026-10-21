@@ -7,11 +7,9 @@ import psycopg
 import pytest
 from cryptography.fernet import Fernet
 
-import configure_runtime
-import database
-import runtime_config as config
-
-
+import scripts.configure_runtime as configure_runtime
+import sql_quiz.database as database
+import sql_quiz.runtime_config as config
 @pytest.fixture
 def private_config(monkeypatch):
     for name in (*config.PRIVATE_SETTINGS, "DATABASE_URL", "DATABASE_PASSWORD"):
@@ -61,7 +59,7 @@ def test_legacy_local_settings_do_not_require_configuration_table(private_config
 def test_uninitialized_private_table_returns_actionable_error(private_config):
     _, _, conn, _ = private_config
     conn.execute.return_value.fetchone.return_value = None
-    with pytest.raises(config.RuntimeConfigError, match="configure_runtime.py --init"):
+    with pytest.raises(config.RuntimeConfigError, match="-m scripts.configure_runtime --init"):
         config.get_setting("SUPABASE_URL")
 
 

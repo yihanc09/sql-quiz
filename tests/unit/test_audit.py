@@ -4,9 +4,9 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-import auth
-import database
-import audit_admin
+import sql_quiz.auth as auth
+import sql_quiz.database as database
+import scripts.audit_admin as audit_admin
 import psycopg
 
 

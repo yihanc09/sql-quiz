@@ -18,3 +18,9 @@ package = false
 [tool.vercel]
 # app.py is the original Streamlit UI, not the HTTP application.
 entrypoint = "web_server:handler"
+
+[tool.pytest.ini_options]
+# Default checks are offline; use `python -m pytest tests/integration` for Supabase.
+testpaths = ["tests/unit"]
+pythonpath = ["."]
+cache_dir = ".cache/pytest"

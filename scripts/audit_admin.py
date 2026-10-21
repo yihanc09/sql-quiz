@@ -5,12 +5,12 @@ DATABASE_URL must be a trusted backend/admin connection, never quiz_reader.
 
 import argparse
 import json
-from pathlib import Path
+from sql_quiz.paths import SQL_DIR
 
 import psycopg
 from psycopg import sql
 
-from database import get_connection
+from sql_quiz.database import get_connection
 
 TABLE = "public.quiz_audit_log"
 PRIVILEGES = ("SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER")
@@ -93,7 +93,7 @@ def main():
         with get_connection(read_only=False) as conn:
             if args.apply:
                 conn.autocommit = True
-                migration = Path(__file__).resolve().parent / "sql" / "001_audit_hardening.sql"
+                migration = SQL_DIR / "001_audit_hardening.sql"
                 conn.execute(migration.read_text(), prepare=False)
                 print("Audit migration applied; existing records retained.")
             elif args.check:

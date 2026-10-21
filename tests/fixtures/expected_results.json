@@ -2,7 +2,7 @@
   "1": {
     "title": "Count Artists",
     "points": 4,
-    "expected_sql": "SELECT COUNT(*) AS total_artists\n            FROM chinook.artist;",
+    "expected_sql": "SELECT COUNT(*) AS total_artists\n            FROM public.artist;",
     "columns": [
       "total_artists"
     ],
@@ -15,7 +15,7 @@
   "2": {
     "title": "Albums by Artist",
     "points": 4,
-    "expected_sql": "SELECT\n                ar.name AS artist,\n                COUNT(al.album_id) AS album_count\n            FROM chinook.artist AS ar\n            JOIN chinook.album AS al\n                ON ar.artist_id = al.artist_id\n            GROUP BY ar.artist_id, ar.name\n            ORDER BY album_count DESC, artist ASC\n            LIMIT 5;",
+    "expected_sql": "SELECT\n                ar.name AS artist,\n                COUNT(al.album_id) AS album_count\n            FROM public.artist AS ar\n            JOIN public.album AS al\n                ON ar.artist_id = al.artist_id\n            GROUP BY ar.artist_id, ar.name\n            ORDER BY album_count DESC, artist ASC\n            LIMIT 5;",
     "columns": [
       "artist",
       "album_count"
@@ -46,7 +46,7 @@
   "3": {
     "title": "Average Track Duration",
     "points": 4,
-    "expected_sql": "SELECT\n                g.name AS genre,\n                ROUND(AVG(t.milliseconds) / 60000.0, 2)\n                    AS avg_minutes\n            FROM chinook.genre AS g\n            JOIN chinook.track AS t\n                ON g.genre_id = t.genre_id\n            GROUP BY g.genre_id, g.name\n            ORDER BY genre;",
+    "expected_sql": "SELECT\n                g.name AS genre,\n                ROUND(AVG(t.milliseconds) / 60000.0, 2)\n                    AS avg_minutes\n            FROM public.genre AS g\n            JOIN public.track AS t\n                ON g.genre_id = t.genre_id\n            GROUP BY g.genre_id, g.name\n            ORDER BY genre;",
     "columns": [
       "genre",
       "avg_minutes"
@@ -157,7 +157,7 @@
   "4": {
     "title": "Top Spending Customers",
     "points": 4,
-    "expected_sql": "SELECT\n                c.first_name,\n                c.last_name,\n                ROUND(SUM(i.total)::numeric, 2) AS total_spent\n            FROM chinook.customer AS c\n            JOIN chinook.invoice AS i\n                ON c.customer_id = i.customer_id\n            GROUP BY c.customer_id, c.first_name, c.last_name\n            ORDER BY total_spent DESC, c.customer_id ASC\n            LIMIT 5;",
+    "expected_sql": "SELECT\n                c.first_name,\n                c.last_name,\n                ROUND(SUM(i.total)::numeric, 2) AS total_spent\n            FROM public.customer AS c\n            JOIN public.invoice AS i\n                ON c.customer_id = i.customer_id\n            GROUP BY c.customer_id, c.first_name, c.last_name\n            ORDER BY total_spent DESC, c.customer_id ASC\n            LIMIT 5;",
     "columns": [
       "first_name",
       "last_name",
@@ -194,7 +194,7 @@
   "5": {
     "title": "Most Popular Genres",
     "points": 4,
-    "expected_sql": "SELECT\n                g.name AS genre,\n                SUM(il.quantity) AS tracks_sold\n            FROM chinook.genre AS g\n            JOIN chinook.track AS t\n                ON g.genre_id = t.genre_id\n            JOIN chinook.invoice_line AS il\n                ON t.track_id = il.track_id\n            GROUP BY g.genre_id, g.name\n            ORDER BY tracks_sold DESC, genre ASC\n            LIMIT 5;",
+    "expected_sql": "SELECT\n                g.name AS genre,\n                SUM(il.quantity) AS tracks_sold\n            FROM public.genre AS g\n            JOIN public.track AS t\n                ON g.genre_id = t.genre_id\n            JOIN public.invoice_line AS il\n                ON t.track_id = il.track_id\n            GROUP BY g.genre_id, g.name\n            ORDER BY tracks_sold DESC, genre ASC\n            LIMIT 5;",
     "columns": [
       "genre",
       "tracks_sold"
@@ -202,23 +202,23 @@
     "rows": [
       [
         "Rock",
-        835
+        "835"
       ],
       [
         "Latin",
-        386
+        "386"
       ],
       [
         "Metal",
-        264
+        "264"
       ],
       [
         "Alternative & Punk",
-        244
+        "244"
       ],
       [
         "Jazz",
-        80
+        "80"
       ]
     ]
   }

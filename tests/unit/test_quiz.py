@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
 
-from quiz import get_questions, get_total_points
+from sql_quiz.quiz import get_questions, get_total_points
 
-RESULTS_PATH = Path(__file__).resolve().parents[1] / "data" / "expected_results.json"
+RESULTS_PATH = Path(__file__).resolve().parents[1] / "fixtures" / "expected_results.json"
 
 
 def load_expected_results():

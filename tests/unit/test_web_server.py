@@ -9,9 +9,7 @@ from unittest.mock import Mock
 import pandas as pd
 import pytest
 
-import web_server as web
-
-
+import sql_quiz.web as web
 @pytest.fixture
 def api_request(monkeypatch):
     monkeypatch.setattr(web, "SESSIONS", {})
@@ -55,7 +53,7 @@ def test_cross_origin_rejected(api_request):
     assert api_request("/api/run", {"sql": "SELECT 1"}, origin="https://example.com")[0] == 403
 
 
-@pytest.mark.parametrize("sql", ["DELETE FROM chinook.artist", "SELECT 1; SELECT 2"])
+@pytest.mark.parametrize("sql", ["DELETE FROM public.artist", "SELECT 1; SELECT 2"])
 def test_unsafe_statements_rejected(api_request, monkeypatch, sql):
     execute = Mock()
     monkeypatch.setattr(web, "run_query", execute)
@@ -65,12 +63,12 @@ def test_unsafe_statements_rejected(api_request, monkeypatch, sql):
 
 def test_submission_grades_and_persists(api_request, monkeypatch):
     monkeypatch.setattr(web, "run_query", Mock(return_value=pd.DataFrame({"total_artists": [275]})))
-    status, payload = api_request("/api/submit", {"question_id": 1, "sql": "SELECT COUNT(*) AS total_artists FROM chinook.artist"})
+    status, payload = api_request("/api/submit", {"question_id": 1, "sql": "SELECT COUNT(*) AS total_artists FROM public.artist"})
     assert status == 200 and payload["grade"]["score"] == 4
     assert payload["table"]["data"] == [[275]]
     web.save_graded_answer.assert_called_once()
     assert web.record_query_event.call_args.args[2:4] == ("SUBMIT_QUERY", True)
-    assert web.record_query_event.call_args.args[4] == "SELECT COUNT(*) AS total_artists FROM chinook.artist"
+    assert web.record_query_event.call_args.args[4] == "SELECT COUNT(*) AS total_artists FROM public.artist"
 
 
 def test_save_preserves_unchanged_grade(api_request):
@@ -100,8 +98,72 @@ def test_logout_clears_local_session(api_request):
 
 
 def test_missing_private_configuration_is_not_reported_as_invalid_login(api_request, monkeypatch):
-    message = "Run python configure_runtime.py --init once to initialize private settings."
+    message = "Run python -m scripts.configure_runtime --init once to initialize private settings."
     monkeypatch.setattr(web, "sign_in", Mock(side_effect=web.RuntimeConfigError(message)))
     status, payload = api_request("/api/login", {"email": "student@example.com", "password": "test"}, False)
     assert status == 503
     assert payload["error"] == message
+
+
+def test_hint_requires_authentication(api_request, monkeypatch):
+    execute = Mock()
+    monkeypatch.setattr(web, 'run_query', execute)
+    assert api_request('/api/hint', {'question_id': 1}, False)[0] == 401
+    execute.assert_not_called()
+
+
+def test_hint_executes_reference_again_each_time(api_request, monkeypatch):
+    execute = Mock(side_effect=[pd.DataFrame({'total_artists': [275]}),
+                                pd.DataFrame({'total_artists': [276]})])
+    monkeypatch.setattr(web, 'run_query', execute)
+    first = api_request('/api/hint', {'question_id': 1})
+    second = api_request('/api/hint', {'question_id': 1})
+    assert first[1]['rows'] == [[275]]
+    assert second[1]['rows'] == [[276]]
+    assert second[1]['source'] == 'live_database'
+    assert 'public.artist' in second[1]['expected_sql']
+    assert execute.call_count == 2
+
+
+@pytest.mark.parametrize('qid', [True, 0, 6, '1', None])
+def test_invalid_hint_question_rejected(api_request, monkeypatch, qid):
+    execute = Mock()
+    monkeypatch.setattr(web, 'run_query', execute)
+    assert api_request('/api/hint', {'question_id': qid})[0] == 400
+    execute.assert_not_called()
+
+
+def test_hint_database_failure_has_no_static_fallback(api_request, monkeypatch):
+    monkeypatch.setattr(web, 'run_query', Mock(side_effect=RuntimeError('private password')))
+    status, payload = api_request('/api/hint', {'question_id': 1})
+    assert status == 502
+    assert 'rows' not in payload
+    assert 'private password' not in payload['error']
+
+
+def test_grading_uses_current_database_instead_of_snapshot(api_request, monkeypatch):
+    # The committed snapshot says 275; the live database now says 276.
+    execute = Mock(return_value=pd.DataFrame({'total_artists': [276]}))
+    monkeypatch.setattr(web, 'run_query', execute)
+    status, payload = api_request('/api/submit', {'question_id': 1, 'sql': 'SELECT 276 AS total_artists'})
+    assert status == 200 and payload['grade']['score'] == 4
+    assert execute.call_args_list[0].args == ('SELECT 276 AS total_artists',)
+    assert 'public.artist' in execute.call_args_list[1].args[0]
+
+
+def test_reference_failure_does_not_save_grade(api_request, monkeypatch):
+    monkeypatch.setattr(web, 'run_query', Mock(side_effect=[
+        pd.DataFrame({'total_artists': [275]}), RuntimeError('secret DB address')]))
+    status, payload = api_request('/api/submit', {'question_id': 1, 'sql': 'SELECT 275 AS total_artists'})
+    assert status == 502 and 'grade' not in payload
+    assert payload['table']['data'] == [[275]]
+    assert 'secret DB address' not in payload['error']
+    web.save_graded_answer.assert_not_called()
+
+
+def test_all_uploaded_tables_and_shared_hints_are_in_metadata(api_request):
+    status, payload = api_request('/api/questions')
+    assert status == 200
+    assert payload['database']['schema'] == 'public'
+    assert len(payload['database']['tables']) == 11
+    assert all(q['hint']['connections'] and q['tables'] for q in payload['questions'])

@@ -1,6 +1,6 @@
 import pandas as pd
 import psycopg
-from runtime_config import backend_connection, get_setting
+from sql_quiz.runtime_config import backend_connection, get_setting
 
 
 def get_connection(read_only=True):

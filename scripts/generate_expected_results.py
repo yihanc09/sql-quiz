@@ -1,10 +1,13 @@
-"""Generate reference SQL results for the five quiz questions."""
+"""Export a live-reference snapshot for offline tests/documentation only.
+
+Production hints and grading fetch live database results via quiz_reference.py.
+"""
 
 import json
-from pathlib import Path
+from sql_quiz.paths import PROJECT_ROOT
 
-from database import run_query
-from quiz import get_questions
+from sql_quiz.database import run_query
+from sql_quiz.quiz import get_questions
 
 
 def main():
@@ -12,6 +15,8 @@ def main():
 
     for question in get_questions():
         result = run_query(question["expected_sql"])
+        if result.empty:
+            raise ValueError(f"Q{question['id']} returned no rows; check data, reader grants and RLS before exporting a snapshot.")
 
         # Convert database values to JSON-compatible values.
         expected_results[str(question["id"])] = {
@@ -26,7 +31,7 @@ def main():
             f"Q{question['id']}: " f"{len(result)} rows, {len(result.columns)} columns"
         )
 
-    output_path = Path("data/expected_results.json")
+    output_path = PROJECT_ROOT / "tests" / "fixtures" / "expected_results.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     output_path.write_text(

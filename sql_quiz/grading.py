@@ -1,20 +1,10 @@
-"""Grade SQL results against reference tables, accounting for DB/JSON numeric types."""
+"""Grade SQL results against live references; explicit fixtures support offline tests."""
 
-import json
-import math
 from decimal import Decimal, InvalidOperation
 from numbers import Number
-from pathlib import Path
 
 import pandas as pd
-
-RESULTS_PATH = Path(__file__).resolve().parent / "data" / "expected_results.json"
-
-
-def load_expected_results():
-    with RESULTS_PATH.open(encoding="utf-8") as handle:
-        return json.load(handle)
-
+from sql_quiz.quiz_reference import get_live_reference
 
 def _normalize(value):
     """Use the same representation for Decimal, numpy numbers and JSON numbers.
@@ -52,10 +42,10 @@ def _normalize(value):
 def grade_result(question_id, actual, reference=None):
     """Return (is_correct, feedback) after comparing columns and row values.
 
-    Q1 and Q3 do not require row ordering. Q2, Q4 and Q5 do.
+    Q1 is a single aggregate row. Q2–Q5 require the requested row ordering.
     """
     if reference is None:
-        reference = load_expected_results()
+        reference = {str(question_id): get_live_reference(question_id)}
     expected = reference[str(question_id)]
     expected_columns = expected["columns"]
     if list(actual.columns) != expected_columns:
@@ -69,7 +59,7 @@ def grade_result(question_id, actual, reference=None):
     if len(actual_rows) != len(expected_rows):
         return False, f"Expected {len(expected_rows)} rows, got {len(actual_rows)}."
 
-    if question_id in (1, 3):
+    if question_id == 1:
         correct = sorted(actual_rows, key=repr) == sorted(expected_rows, key=repr)
     else:
         correct = actual_rows == expected_rows

@@ -10,3 +10,9 @@ progress.full{display:block;width:100%;height:7px;border:0;border-radius:5px;acc
 .question-hint dt{font-size:10px;font-weight:700;color:#34557f;margin-bottom:5px}
 .question-hint dd{margin:0;font-size:12px;line-height:1.8;color:#496384;overflow-wrap:anywhere}
 @media(max-width:640px){.question-hint{padding:17px}.question-hint dd{font-size:11px}}
+
+/* Reference SQL and result tables inside the live question hint. */
+.reference-sql { overflow: auto; max-height: 320px; white-space: pre; font-size: .85rem; padding: 16px; background: var(--surface, #f4f6fa); border-radius: 8px; }
+.question-hint details { margin-top: 16px; }
+.question-hint summary { cursor: pointer; font-weight: 600; }
+.question-hint .table-scroll { margin-top: 12px; }

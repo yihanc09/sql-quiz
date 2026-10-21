@@ -6,12 +6,12 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from grading import grade_result
+from sql_quiz.grading import grade_result
 
 
 @pytest.fixture
 def reference():
-    path = Path(__file__).resolve().parents[1] / "data" / "expected_results.json"
+    path = Path(__file__).resolve().parents[1] / "fixtures" / "expected_results.json"
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -41,3 +41,18 @@ def test_wrong_ranked_order_is_rejected(reference):
 def test_wrong_columns_are_rejected(reference):
     actual = pd.DataFrame([[275]], columns=["count"])
     assert not grade_result(1, actual, reference)[0]
+
+
+def test_genres_must_be_alphabetical_as_question_requests(reference):
+    expected = reference['3']
+    actual = pd.DataFrame(list(reversed(expected['rows'])), columns=expected['columns'])
+    assert not grade_result(3, actual, reference)[0]
+
+
+def test_default_grading_fetches_live_reference(monkeypatch):
+    import sql_quiz.grading as grading
+    from unittest.mock import Mock
+    live = Mock(return_value={'columns': ['total_artists'], 'rows': [[300]]})
+    monkeypatch.setattr(grading, 'get_live_reference', live)
+    assert grading.grade_result(1, pd.DataFrame({'total_artists': [300]}))[0]
+    live.assert_called_once_with(1)

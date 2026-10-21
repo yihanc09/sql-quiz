@@ -7,13 +7,14 @@ only DATABASE_URL and DATABASE_PASSWORD. Existing settings are never overwritten
 import argparse
 import os
 from pathlib import Path
+from sql_quiz.paths import SQL_DIR
 
 import psycopg
 from cryptography.fernet import Fernet
 from dotenv import dotenv_values
 from psycopg.types.json import Jsonb
 
-from runtime_config import PRIVATE_SETTINGS, RuntimeConfigError, backend_connection
+from sql_quiz.runtime_config import PRIVATE_SETTINGS, RuntimeConfigError, backend_connection
 
 
 def seed_settings(conn, source=None):
@@ -78,7 +79,7 @@ def main():
         with backend_connection() as conn:
             if args.init:
                 conn.autocommit = True
-                migration = Path(__file__).resolve().parent / "sql" / "002_runtime_configuration.sql"
+                migration = SQL_DIR / "002_runtime_configuration.sql"
                 conn.execute(migration.read_text(), prepare=False)
                 with conn.transaction():
                     source = dotenv_values(args.from_env) if args.from_env else None

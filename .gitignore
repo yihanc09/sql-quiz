@@ -7,11 +7,18 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.cache/
 .venv/
 venv/
+
+# Local R session history
+.Rhistory
 
 # macOS
 .DS_Store
 
 # Streamlit secrets
 .streamlit/secrets.toml
+# Generated local vector storage (rebuild from knowledge/documents.jsonl)
+.chroma/
+chroma_data/

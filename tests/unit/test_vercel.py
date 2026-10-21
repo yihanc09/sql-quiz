@@ -13,10 +13,8 @@ from unittest.mock import Mock
 import pytest
 from cryptography.fernet import Fernet
 
-import web_server as web
-import web_sessions as sessions
-
-
+import sql_quiz.web as web
+import sql_quiz.web_sessions as sessions
 @pytest.fixture
 def vercel(monkeypatch):
     monkeypatch.setenv("VERCEL", "1")
@@ -38,12 +36,14 @@ def request(path, data=None, cookie="", origin="https://quiz.example.com"):
 
 
 def test_configured_entrypoint_is_an_http_handler():
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[2]
     config = tomllib.loads((root / "pyproject.toml").read_text())
     assert config["tool"]["vercel"]["entrypoint"] == "web_server:handler"
     assert issubclass(web.handler, BaseHTTPRequestHandler)
+    import web_server
+    assert web_server.handler is web.handler
     assert (root / "frontend/index.html").is_file()
-    assert (root / "data/expected_results.json").is_file()
+    assert (root / "data/schema.json").is_file()
 
 
 def test_login_cookie_restores_on_another_instance_and_refreshes_tokens(vercel):
@@ -99,7 +99,7 @@ def test_missing_session_key_returns_actionable_configuration_error(vercel):
     instance = request("/api/login", {"email": "student@example.com", "password": "test"})
     instance.do_POST()
     assert instance.reply.call_args.args[0] == 503
-    assert "configure_runtime.py --init" in instance.reply.call_args.args[1]["error"]
+    assert "-m scripts.configure_runtime --init" in instance.reply.call_args.args[1]["error"]
     login.assert_not_called()
 
 
