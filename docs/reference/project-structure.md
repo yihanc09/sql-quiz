@@ -22,7 +22,7 @@ The root holds the README, environment template, launchers and platform configur
 | `tests/fixtures/` | Offline reference snapshot; production grading queries live data |
 | `docs/guides/` | Setup, deployment, cloud/local retrieval and AI usage |
 | `docs/reference/` | Structure and live-database design |
-| `docs/evidence/` | Deployment records, actual screenshots and captured JSON examples |
+| `docs/evidence/` | Deployment records and captured JSON examples |
 | `docs/archive/` | Historical preparation and implementation handoff |
 | `.github/workflows/` | CI jobs with GitHub Secrets for database checks |
 | `.vscode/settings.json` | Workspace-only Explorer exclusions for generated/private files |

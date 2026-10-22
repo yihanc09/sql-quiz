@@ -6,7 +6,7 @@ The local web application performs the full question → Chroma vector retrieval
 
 A real local call on October 21, 2026 retrieved five knowledge documents and generated `SELECT COUNT(*) AS total_artists FROM public.artist;`. The [captured response](../evidence/examples/openai_generation.json) includes the generated SQL and actual retrieval evidence. It is a CLI smoke check, not a screenshot or a public deployment check.
 
-Cloud retrieval has subsequently been implemented and verified; see [Chroma Cloud](chroma-cloud.md). The full public flow and required screenshot are now verified; see [production verification](../evidence/deployment-verification.md).
+Cloud retrieval has subsequently been implemented and verified; see [Chroma Cloud](chroma-cloud.md). The full public flow has been verified; see [production verification](../evidence/deployment-verification.md).
 
 ## Configure and run
 
@@ -70,6 +70,6 @@ Tests cover retrieval before generation, no model call on failed/empty retrieval
 
 ## Deployment maintenance
 
-The implemented Chroma Cloud path uses OpenAI embeddings consistently for ingestion and queries; follow the cloud setup guide. Configure `OPENAI_API_KEY` and `OPENAI_MODEL` as backend deployment environment variables, then verify the full public flow whenever changing deployment configuration. The current public question/generated-SQL screenshot is included in the README. Manual run/submit buttons are useful verification tools; this stage does not claim the assignment's automatic execution/validation extra credit.
+The implemented Chroma Cloud path uses OpenAI embeddings consistently for ingestion and queries; follow the cloud setup guide. Configure `OPENAI_API_KEY` and `OPENAI_MODEL` as backend deployment environment variables, then verify the full public flow whenever changing deployment configuration. The earlier question/generated-SQL screenshot has been removed; a replacement is needed for the submission. Manual run/submit buttons are useful verification tools; this stage does not claim the assignment's automatic execution/validation extra credit.
 
 Official references: [OpenAI text generation and Responses output](https://developers.openai.com/api/docs/guides/text), [GPT-4.1 mini model](https://developers.openai.com/api/docs/models/gpt-4.1-mini).

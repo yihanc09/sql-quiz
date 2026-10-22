@@ -30,6 +30,6 @@ All eight new variables were confirmed in Vercel as Production Secrets, and [pro
 - Use in editor followed by Run query returned `total_artists = 275` through the restricted production reader.
 - The test did not save a draft or submit a grade; existing saved answers were retained.
 
-[Question and generated SQL screenshot](screenshots/week8-production-generated-sql.png) · [Execution and cloud metadata screenshot](screenshots/week8-production-cloud-result.png).
+The earlier screenshot captures have been removed. Replacement screenshots are still needed for the Week 8 submission.
 
-These production screenshots supplement the CLI JSON examples in `docs/evidence/examples/`. The application requires explicit Run/Submit actions and does not implement automatic execution/validation extra credit.
+The CLI JSON examples remain available in `docs/evidence/examples/`. The application requires explicit Run/Submit actions and does not implement automatic execution/validation extra credit.

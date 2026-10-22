@@ -24,7 +24,6 @@ Start with the [project overview and live application](../README.md). Choose a d
 | Evidence | Contents |
 |---|---|
 | [Deployment verification](evidence/deployment-verification.md) | Repository commits, passing CI/builds and authenticated production checks |
-| [Screenshots](evidence/screenshots.md) | Real production SQL generation, cloud retrieval and result table |
 | [Captured API examples](evidence/examples/) | Real local/cloud retrieval and generation JSON responses |
 
 ## Archive: implementation history

@@ -95,9 +95,9 @@ Expose retrieval evidence (source IDs or table names) beside generated SQL so th
 - Chroma Cloud/OpenAI credentials are configured as Production Secrets in Vercel.
 - Both repositories contain the generation feature, retrieval integration, UI and setup documentation.
 - The deployed question → retrieval → AI → SQL flow passed authenticated browser verification.
-- The README includes an actual production question/generated-SQL screenshot.
+- Earlier production screenshots have been removed; a replacement question/generated-SQL capture is needed for submission.
 - Manual execution of the generated count query returned 275. Automatic execution/validation extra credit is not implemented.
-- Submit the canonical GitHub repository URL from the README. CI/build and screenshot evidence are linked in [deployment verification](../evidence/deployment-verification.md).
+- Submit the canonical GitHub repository URL from the README. CI/build and authenticated verification records are linked in [deployment verification](../evidence/deployment-verification.md).
 
 ## Deployment references
 
